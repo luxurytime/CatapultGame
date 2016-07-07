@@ -1,5 +1,12 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "SelectScene.h"
+#include "GameScene.h"
+#include "StoryScene.h"
+#include "SaveManegerScene.h"
+#include "AboutGameScene.h"
+
+#include <iostream>
 
 USING_NS_CC;
 
@@ -31,57 +38,93 @@ bool HelloWorld::init()
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
+	Sprite* background = Sprite::create("background.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	addChild(background, 0);
 
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
-    
-    closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));
+	//startMenuItem = MenuItemImage::create("button.png", "button.png", CC_CALLBACK_1(HelloWorld::onStart, this));
+	//startMenuItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	//auto start = Menu::create(startMenuItem, NULL);
+	//start->setPosition(Point::ZERO);
+	//addChild(start, 1);
 
-    // create menu, it's an autorelease object
-    auto menu = Menu::create(closeItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
+	//auto listener = EventListenerMouse::create();
+	//listener->onMouseMove = CC_CALLBACK_1(HelloWorld::onMouseMove, this);
+	//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, this);
 
-    /////////////////////////////
-    // 3. add your codes below...
 
-    // add a label shows "Hello World"
-    // create and initialize a label
-    
-    auto label = Label::createWithTTF("Hello World", "fonts/Marker Felt.ttf", 24);
-    
-    // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - label->getContentSize().height));
+	// add title
 
-    // add the label as a child to this layer
-    this->addChild(label, 1);
+	auto label = LabelTTF::create("MainMenu", "Marker Felt.ttf", 48);
+	auto menuItem = MenuItemLabel::create(label);
+	auto menu = Menu::create(menuItem, nullptr);
+	menu->setPosition(Vec2::ZERO);
+	menuItem->setPosition(visibleSize.width / 2, 17 * visibleSize.height / 20);
+	addChild(menu, 1);
 
-    // add "HelloWorld" splash screen"
-    auto sprite = Sprite::create("HelloWorld.png");
+	// this is for Menu section of the Programmers Guide
+	// creating a Menu from a Vector of items
+	Vector<MenuItem*> MenuItems;
 
-    // position the sprite on the center of the screen
-    sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	// first item
+	auto label1 = LabelTTF::create("Start Game", "Marker Felt.ttf", 32);
+	auto item1 = MenuItemLabel::create(label1);
+	item1->setPosition(visibleSize.width / 2, 13 * visibleSize.height / 20);
+	item1->setCallback([&](cocos2d::Ref *sender) {
+		Director::getInstance()->replaceScene(Select::createScene());
+	});
+	MenuItems.pushBack(item1);
 
-    // add the sprite as a child to this layer
-    this->addChild(sprite, 0);
-    
+	// second item
+	auto label2 = LabelTTF::create("StoryMode", "Marker Felt.ttf", 32);
+	auto item2 = MenuItemLabel::create(label2);
+	item2->setPosition(visibleSize.width / 2, 10 * visibleSize.height / 20);
+	item2->setCallback([&](cocos2d::Ref *sender) {
+		Director::getInstance()->replaceScene(Story::createScene());
+	});
+	MenuItems.pushBack(item2);
+
+	// third item
+	auto label3 = LabelTTF::create("Save Maneger", "Marker Felt.ttf", 32);
+	auto item3 = MenuItemLabel::create(label3);
+	item3->setPosition(visibleSize.width / 2, 7 * visibleSize.height / 20);
+	item3->setCallback([&](cocos2d::Ref *sender) {
+		Director::getInstance()->replaceScene(SaveManeger::createScene());
+	});
+	MenuItems.pushBack(item3);
+
+	// fourth item
+	auto label4 = LabelTTF::create("About Game", "Marker Felt.ttf", 32);
+	auto item4 = MenuItemLabel::create(label4);
+	item4->setPosition(visibleSize.width / 2, 4 * visibleSize.height / 20);
+	item4->setCallback([&](cocos2d::Ref *sender) {
+		Director::getInstance()->replaceScene(AboutGame::createScene());
+	});
+	MenuItems.pushBack(item4);
+
+	// now create the menu from the vector of MenuItems
+	auto menuExample = Menu::createWithArray(MenuItems);
+	menuExample->setPosition(Vec2::ZERO);
+	addChild(menuExample, 2);
+
+
     return true;
 }
 
+void HelloWorld::onMouseMove(Event* event) {
+	EventMouse* e = (EventMouse*)event;
+	CCPoint mousePosition = CCPoint(e->getCursorX(), e->getCursorY() + 640);
 
-void HelloWorld::menuCloseCallback(Ref* pSender)
-{
-    Director::getInstance()->end();
+	auto block1 = startMenuItem->getBoundingBox();
+	if (block1.containsPoint(mousePosition)) largerItem(startMenuItem, 1);
+	else largerItem(NULL, 0);
+}
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
+void HelloWorld::onStart(Ref* ref) {
+	Director::getInstance()->replaceScene(CCTransitionPageTurn::create(1.0f, Select::createScene(), true));
+}
+
+void HelloWorld::largerItem(MenuItemImage* item, int i) {
+	startMenuItem->setScale(1, 1);
+	if (item) item->setScale(1.2, 1.2);
 }
