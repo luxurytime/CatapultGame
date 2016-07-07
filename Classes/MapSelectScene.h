@@ -4,7 +4,7 @@ using namespace std;
 
 USING_NS_CC;
 
-class Select : public cocos2d::Layer
+class MapSelect : public cocos2d::Layer
 {
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -15,9 +15,9 @@ public:
 
 	virtual void onStart(Ref* ref);
 
-	void onMouseMove(Event* event);
+
 	// implement the "static create()" method manually
-	CREATE_FUNC(Select);
+	CREATE_FUNC(MapSelect);
 
 private:
 

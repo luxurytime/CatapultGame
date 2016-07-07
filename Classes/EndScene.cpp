@@ -1,21 +1,20 @@
-#include "SelectScene.h"
+#include "EndScene.h"
 #include "SimpleAudioEngine.h"
 #include "GameScene.h"
 #include "HelloWorldScene.h"
-#include "MapSelectScene.h"
 
 using namespace CocosDenshion;
 
 
 USING_NS_CC;
 
-Scene* Select::createScene()
+Scene* End::createScene()
 {
 	// 'scene' is an autorelease object
 	auto scene = Scene::create();
 
 	// 'layer' is an autorelease object
-	auto layer = Select::create();
+	auto layer = End::create();
 
 	// add layer as a child to scene
 	scene->addChild(layer);
@@ -24,7 +23,7 @@ Scene* Select::createScene()
 	return scene;
 }
 
-bool Select::init()
+bool End::init()
 {
 	if (!Layer::init())
 	{
@@ -37,12 +36,6 @@ bool Select::init()
 	Sprite* background = Sprite::create("background3.jpg");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
-
-	MenuItemImage* startMenuItem = MenuItemImage::create("button.png", "button.png", CC_CALLBACK_1(Select::onStart, this));
-	startMenuItem->setPosition(visibleSize.width / 2, visibleSize.height / 5);
-	auto start = Menu::create(startMenuItem, NULL);
-	start->setPosition(Point::ZERO);
-	addChild(start, 1);
 
 
 	auto label0 = LabelTTF::create("back", "Marker Felt.ttf", 48);
@@ -60,7 +53,6 @@ bool Select::init()
 	return true;
 }
 
-void Select::onStart(Ref* ref) {
-	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, MapSelect::createScene()));
+void End::onStart(Ref* ref) {
+	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, Games::createScene()));
 }
-
