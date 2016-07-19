@@ -3,7 +3,7 @@
 
 #include "Character.h"
 
-class Knight : public Arms {
+class Knight : public Character{
 public:
 	Knight();
 
