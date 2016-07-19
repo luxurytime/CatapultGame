@@ -44,13 +44,15 @@ public:
 	bool isAttacked(int fallPoint, int range);
 
 	//计算伤害
-	void damageCal(Character*, int damage);
+	//void damageCal(Character*, int damage);
 
 	//回合结束，更换玩家，同时设定按钮的Enable等特性
 	void changePlayer();
 
 	//这个函数每一帧都调用一次，根据需要添加内容，如获得炸弹在某个时刻的位置
 	virtual void update(float dt) override;
+
+	virtual void onBack(Ref* ref);
 
 	//射子弹
 	void bullet1fire();
@@ -65,8 +67,24 @@ public:
 	void addListener();// 添加监听器
 	void getFrameAction();// 获得帧动画动作
 
+	void addHpBar();
+
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+
+	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
+
+	void onTouchEnded(Touch *touch, cocos2d::Event *event);
+
+	void onTouchMoved(Touch *touch, cocos2d::Event *event);
+
 	bool onConcactBegan(PhysicsContact& contact);
+
+	void powerRoll(float dt);
+
+	void shootStone(float power, float direction, Vec2 loc);
+
+	void damage(int damage, int player);
+
 
 private:
 
@@ -78,12 +96,21 @@ private:
 	cocos2d::Vector<SpriteFrame*> walk;
 	cocos2d::Vector<SpriteFrame*> dead;
 
-	Sprite* player1;
-	Sprite* player2;
+	Sprite* player[2];
+	//Sprite* player2;
 
 	Sprite* bullet1;
 	Sprite* bullet2;
 
+	Sprite* test;
+
+	CCProgressTimer* powerBar;
+
+	CCProgressTimer* hp1;
+
+	CCProgressTimer* hp2;
+
+	bool powerDir;
 
 	int currentPlayer;          //正在回合的玩家
 	
