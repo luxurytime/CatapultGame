@@ -102,6 +102,9 @@ private:
 	Sprite* bullet1;
 	Sprite* bullet2;
 
+	Sprite* sp1;
+	Sprite* sp2;
+	Sprite* sp;
 	Sprite* test;
 
 	CCProgressTimer* powerBar;

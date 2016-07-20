@@ -190,6 +190,36 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   <ItemGroup>
     <ResourceCompile Include="game.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Resources\$lucia_dead.png" />
+    <Image Include="..\Resources\$lucia_forward.png" />
+    <Image Include="..\Resources\arrow.png" />
+    <Image Include="..\Resources\backgroud.png" />
+    <Image Include="..\Resources\background2.jpg" />
+    <Image Include="..\Resources\background3.jpg" />
+    <Image Include="..\Resources\Ball.png" />
+    <Image Include="..\Resources\bomb.png" />
+    <Image Include="..\Resources\bullet1.png" />
+    <Image Include="..\Resources\bullet2.png" />
+    <Image Include="..\Resources\button.png" />
+    <Image Include="..\Resources\CloseNormal.png" />
+    <Image Include="..\Resources\CloseSelected.png" />
+    <Image Include="..\Resources\Ete.png" />
+    <Image Include="..\Resources\HelloWorld.png" />
+    <Image Include="..\Resources\hp.png" />
+    <Image Include="..\Resources\life.png" />
+    <Image Include="..\Resources\line.png" />
+    <Image Include="..\Resources\line2.png" />
+    <Image Include="..\Resources\lp.png" />
+    <Image Include="..\Resources\player.png" />
+    <Image Include="..\Resources\Toge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Resources\bgm.mp3" />
+    <Media Include="..\Resources\move.mp3" />
+    <Media Include="..\Resources\shoot.mp3" />
+    <Media Include="..\Resources\shout.mp3" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

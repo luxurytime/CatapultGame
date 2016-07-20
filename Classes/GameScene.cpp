@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "SimpleAudioEngine.h"
+#include "EndScene.h"
 #include "HelloWorldScene.h"
 #include <math.h>
 
@@ -123,10 +124,13 @@ bool Games::init()
 }
 
 void Games::addHpBar(){
-	Sprite* sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	Sprite* sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	Sprite* sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
+	//sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	//sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	//sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
 
+	sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
 	//血条1
 	hp1 = ProgressTimer::create(sp);
 	hp1->setScaleX(90);
@@ -231,7 +235,7 @@ Sprite* Games::addPlayer(int x){
 	// 创建一张贴图, 从贴图中以像素单位切割，创建关键帧
 	auto texture = Director::getInstance()->getTextureCache()->addImage("$lucia_forward.png");
 	auto frame0 = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(10, 10, 48, 81)));
-
+	//auto player1 = AutoPolygon::;
 	auto player = Sprite::createWithSpriteFrame(frame0);
 	player->setScale(2.0, 2.0);
 	player->setPosition(Vec2(x, origin.y + player->getContentSize().height / 2 + altitude));
@@ -490,6 +494,9 @@ void Games::shootStone(float power, float direction, Vec2 loc)
 {
 	int pow = 4 ;
 	
+	//if (sp1->getParent() <= 0 || sp2->getParent <= 0) {
+
+	//}
 	if (currentPlayer == 0) {
 		log("player1");
 		if (bullet1 == NULL) {
@@ -620,11 +627,12 @@ void Games::shootStone(float power, float direction, Vec2 loc)
 void Games::damage(int damage, int player)
 {
 	if (player == 0) {
-		if (hp1->getPercentage() + damage >= 0 && hp1->getPercentage() + damage <= 100) {
+		if (hp1->getPercentage() + damage > 0 && hp1->getPercentage() + damage <= 100) {
 			hp1->setPercentage(hp1->getPercentage() + damage);
 		}
-		else if (hp1->getPercentage() + damage < 0) {
+		else if (hp1->getPercentage() + damage <= 0) {
 			hp1->setPercentage(0);
+			Director::getInstance()->replaceScene(End::createScene());
 		}
 		else {
 			hp1->setPercentage(100);
@@ -634,11 +642,12 @@ void Games::damage(int damage, int player)
 		hp1->runAction(updateHP);
 	}
 	else if(player == 1){
-		if (hp2->getPercentage() + damage >= 0 && hp2->getPercentage() + damage <= 100) {
+		if (hp2->getPercentage() + damage > 0 && hp2->getPercentage() + damage <= 100) {
 			hp2->setPercentage(hp2->getPercentage() + damage);
 		}
-		else if (hp2->getPercentage() + damage < 0) {
+		else if (hp2->getPercentage() + damage <= 0) {
 			hp2->setPercentage(0);
+			Director::getInstance()->replaceScene(End::createScene());
 		}
 		else {
 			hp2->setPercentage(100);

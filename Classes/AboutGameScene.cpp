@@ -32,6 +32,10 @@ bool AboutGame::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+
+	Sprite* background = Sprite::create("background2.jpg");
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	addChild(background, 0);
 	/////////////////////////////
 	// 2. add a menu item with "X" image, which is clicked to quit the program
 	//    you may modify it.
@@ -45,7 +49,7 @@ bool AboutGame::init()
 	// add a label shows "Hello World"
 	// create and initialize a label
 
-	auto label = Label::createWithTTF("AboutGameScene", "fonts/Marker Felt.ttf", 24);
+	auto label = Label::createWithTTF("AboutGameScene", "fonts/STHUPO.ttf", 24);
 
 	// position the label on the center of the screen
 	label->setPosition(Vec2(origin.x + visibleSize.width / 2,
@@ -59,9 +63,9 @@ bool AboutGame::init()
 	auto label1 = LabelTTF::create("Menu and MenuItem", "Marker Felt.ttf", 32);
 	label1->setPosition(visibleSize.width / 2, 17 * visibleSize.height / 20);
 
-	this->addChild(label1, 1);
+	//this->addChild(label1, 1);
 
-	auto label2 = LabelTTF::create("Back", "Marker Felt.ttf", 48);
+	auto label2 = LabelTTF::create("Back", "STHUPO.ttf", 48);
 	auto menuItem = MenuItemLabel::create(label2);
 	auto menu = Menu::create(menuItem, nullptr);
 	menuItem->setCallback([&](cocos2d::Ref *sender) {

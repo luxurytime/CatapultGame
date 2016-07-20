@@ -104,4 +104,86 @@
       <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Resources\$lucia_dead.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\$lucia_forward.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\arrow.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\backgroud.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\background2.jpg">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\background3.jpg">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\Ball.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\bomb.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\bullet1.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\bullet2.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\button.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\CloseNormal.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\CloseSelected.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\Ete.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\HelloWorld.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\hp.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\life.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\line.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\line2.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\lp.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\player.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\Toge.png">
+      <Filter>resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Resources\bgm.mp3">
+      <Filter>resource</Filter>
+    </Media>
+    <Media Include="..\Resources\move.mp3">
+      <Filter>resource</Filter>
+    </Media>
+    <Media Include="..\Resources\shoot.mp3">
+      <Filter>resource</Filter>
+    </Media>
+    <Media Include="..\Resources\shout.mp3">
+      <Filter>resource</Filter>
+    </Media>
+  </ItemGroup>
 </Project>
