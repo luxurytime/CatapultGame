@@ -1,6 +1,7 @@
-#include "GameScene.h"
+ï»¿#include "GameScene.h"
 #include "SimpleAudioEngine.h"
 #include "HelloWorldScene.h"
+#include "EndScene.h"
 #include <math.h>
 
 using namespace CocosDenshion;
@@ -67,20 +68,13 @@ bool Games::init()
 	//bomb->setScale(0.4, 0.4);
 	//addChild(bomb, 2);
 
-	//Sprite* life = Sprite::create("life.png");
-	//life->setPosition(100, visibleSize.height - 30);
-	//life->setScale(1.5, 1.5);
-	//addChild(life, 1);
+
 
 	//Sprite* lifep = Sprite::create("lp.png");
 	//lifep->setPosition(50, visibleSize.height-30);
 	//lifep->setScale(0.2, 0.2);
 	//addChild(lifep, 2);
 
-	//Sprite* life2 = Sprite::create("life.png");
-	//life2->setPosition(visibleSize.width-100, visibleSize.height - 30);
-	//life2->setScale(1.5, 1.5);
-	//addChild(life2, 1);
 
 	//Sprite* lifep2 = Sprite::create("lp.png");
 	//lifep2->setPosition(visibleSize.width - 50, visibleSize.height - 30);
@@ -95,7 +89,7 @@ bool Games::init()
 	});
 	menu->setPosition(Vec2::ZERO);
 	menuItem->setPosition(visibleSize.width*0.2, visibleSize.height*0.9);
-	addChild(menu, 1);
+	//addChild(menu, 1);
 
 	/*MenuItemImage* startMenuItem = MenuItemImage::create("button.png", "button.png", CC_CALLBACK_1(Games::onBack, this));
 	startMenuItem->setPosition(visibleSize.width / 8, visibleSize.height);
@@ -105,53 +99,70 @@ bool Games::init()
 
 	powerDir = false;
 
+	already = false;
+
 	currentPlayer = 0;
 
-	player[0] = addPlayer(origin.x + visibleSize.width / 4);
-	player[0]->setTag(1);
-	player[1] = addPlayer(origin.x + visibleSize.width / 4 * 3);
-	player[1]->setFlipX(true);
-	player[1]->setTag(2);
+	player[0] = new Boy();
+	player[1] = new Boy();
 
-	//hpBar
-	hp1 = CCProgressTimer::create(Sprite::create("Ete.png"));
-	hp1->setType(ProgressTimer::Type::BAR);
-	hp1->setMidpoint(Point(0, 0));
-	hp1->setBarChangeRate(Point(1, 0));
-	hp1->setPercentage(100);
-	hp1->setPosition(visibleSize.width*0.25, visibleSize.height*0.8);
-	addChild(hp1, 3);
-
-	hp2 = CCProgressTimer::create(Sprite::create("Ete.png"));
-	hp2->setScale(-1, 1);
-	hp2->setType(ProgressTimer::Type::BAR);
-	hp2->setMidpoint(Point(0, 0));
-	hp2->setBarChangeRate(Point(1, 0));
-	hp2->setPercentage(100);
-	hp2->setPosition(visibleSize.width*0.75, visibleSize.height*0.8);
-	addChild(hp2, 3);
+	addPlayer(origin.x + visibleSize.width / 4, 0);
+	player[0]->getCharaSpr()->setTag(1);
+	addPlayer(origin.x + visibleSize.width / 4 * 3, 1);
+	player[1]->getCharaSpr()->setFlipX(true);
+	player[1]->getCharaSpr()->setTag(2);
 
 	preloadMusic();
-	playBgm();
+	//playBgm();
 
 	addEdge();
 	addListener();
-	getFrameAction();
+	//getFrameAction();
+	//getFrameAction2();
+	addHpBar();
 
 	bullet1 = NULL;
 	bullet2 = NULL;
 
 	scheduleUpdate();
 
-	//mouse event listener
-	auto listener = EventListenerTouchOneByOne::create();  //µ¥µã´¥ÃþÊÂ¼þEventListenerTouchAllAtOnce
-	
-	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
-	listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-	
+
 	return true;
+}
+
+void Games::addHpBar(){
+	Sprite* sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	Sprite* sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	Sprite* sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
+
+	//Ã‘ÂªÃŒÃµ1
+	hp1 = ProgressTimer::create(sp);
+	hp1->setScaleX(90);
+	hp1->setAnchorPoint(Vec2(0, 0));
+	hp1->setType(ProgressTimerType::BAR);
+	hp1->setBarChangeRate(Point(1, 0));
+	hp1->setMidpoint(Point(0, 1));
+	hp1->setPercentage(100);
+	hp1->setPosition(Vec2(origin.x + 14 * hp1->getContentSize().width, origin.y + visibleSize.height - 2 * hp1->getContentSize().height));
+	addChild(hp1, 4);
+	sp1->setAnchorPoint(Vec2(0, 0));
+	sp1->setPosition(Vec2(origin.x + hp1->getContentSize().width, origin.y + visibleSize.height - sp1->getContentSize().height));
+	addChild(sp1, 3);
+
+	//Ã‘ÂªÃŒÃµ2
+	hp2 = ProgressTimer::create(sp);
+	hp2->setScaleX(90);
+	hp2->setAnchorPoint(Vec2(0, 0));
+	hp2->setType(ProgressTimerType::BAR);
+	hp2->setBarChangeRate(Point(1, 0));
+	hp2->setMidpoint(Point(1, 0));
+	hp2->setPercentage(100);
+	hp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 14 * hp2->getContentSize().width, origin.y + visibleSize.height - 2 * hp2->getContentSize().height));
+	addChild(hp2, 4);
+	sp2->setAnchorPoint(Vec2(0, 0));
+	sp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 11 * hp2->getContentSize().width + 1.5, origin.y + visibleSize.height - sp2->getContentSize().height));
+	addChild(sp2, 3);
+	sp2->setFlipX(true);
 }
 
 bool Games::onTouchBegan(Touch *touch, cocos2d::Event *event){
@@ -160,13 +171,13 @@ bool Games::onTouchBegan(Touch *touch, cocos2d::Event *event){
 	powerBar = CCProgressTimer::create(Sprite::create("Toge.png"));
 	powerBar->setAnchorPoint(Vec2(0, 0.5));
 	//powerBar->setRotation(-45);
-	if ((location.x - player[currentPlayer]->getPosition().x) < 0)
+	if ((location.x - player[currentPlayer]->getCharaSpr()->getPosition().x) < 0)
 	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180 + 180);
+		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getCharaSpr()->getPosition().y) / (location.x - player[currentPlayer]->getCharaSpr()->getPosition().x))) / 3.1416 * 180 + 180);
 	}
 	else
 	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180);
+		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getCharaSpr()->getPosition().y) / (location.x - player[currentPlayer]->getCharaSpr()->getPosition().x))) / 3.1416 * 180);
 	}
 
 	powerBar->setType(ProgressTimer::Type::BAR);
@@ -174,7 +185,7 @@ bool Games::onTouchBegan(Touch *touch, cocos2d::Event *event){
 	powerBar->setBarChangeRate(Point(1, 0));
 	powerBar->setPercentage(0);
 
-	powerBar->setPosition(player[currentPlayer]->getPosition().x, player[currentPlayer]->getPosition().y);
+	powerBar->setPosition(player[currentPlayer]->getCharaSpr()->getPosition().x, player[currentPlayer]->getCharaSpr()->getPosition().y);
 	addChild(powerBar, 3);
 
 	this->schedule(schedule_selector(Games::powerRoll), 0.002f);
@@ -186,7 +197,8 @@ bool Games::onTouchBegan(Touch *touch, cocos2d::Event *event){
 void Games::onTouchEnded(Touch *touch, cocos2d::Event *event){
 	this->unschedule(schedule_selector(Games::powerRoll));
 
-	shootStone(powerBar->getPercentage(), powerBar->getRotation());
+
+	shootStone(powerBar->getPercentage(), powerBar->getRotation(), touch->getLocation());
 
 	removeChild(powerBar);
 
@@ -196,13 +208,13 @@ void Games::onTouchEnded(Touch *touch, cocos2d::Event *event){
 
 void Games::onTouchMoved(Touch *touch, cocos2d::Event *event){
 	auto location = touch->getLocation();
-	if ((location.x - player[currentPlayer]->getPosition().x) < 0)
+	if ((location.x - player[currentPlayer]->getCharaSpr()->getPosition().x) < 0)
 	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180 + 180);
+		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getCharaSpr()->getPosition().y) / (location.x - player[currentPlayer]->getCharaSpr()->getPosition().x))) / 3.1416 * 180 + 180);
 	}
 	else
 	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180);
+		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getCharaSpr()->getPosition().y) / (location.x - player[currentPlayer]->getCharaSpr()->getPosition().x))) / 3.1416 * 180);
 	}
 	//this->schedule(schedule_selector(Games::powerRoll), 0.002f);
 	//auto location = touch->getLocation();
@@ -211,9 +223,7 @@ void Games::onTouchMoved(Touch *touch, cocos2d::Event *event){
 }
 
 void Games::preloadMusic() {
-	// Ô¤¼ÓÔØÒôÀÖ
-	//auto audio = SimpleAudioEngine::getInstance();
-	//audio->preloadBackgroundMusic("music/bgm.mp3");
+	// Ã”Â¤Â¼Ã“Ã”Ã˜Ã’Ã´Ã€Ã–
 	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("shoot.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("move.mp3");
@@ -221,25 +231,19 @@ void Games::preloadMusic() {
 }
 
 void Games::playBgm() {
-	//SimpleAudioEngine::getInstance()->playBackgroundMusic("bgm.mp3", true);
 	SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm.mp3", true);
 }
 
+Sprite* Games::addPlayer(int x, int t)
+{
+	player[t]->getCharaSpr()->setScale(2.0, 2.0);
+	player[t]->getCharaSpr()->setPosition(Vec2(x, origin.y + player[t]->getCharaSpr()->getContentSize().height / 2 + altitude));
+	player[t]->getCharaSpr()->setPhysicsBody(PhysicsBody::createBox(player[t]->getCharaSpr()->getContentSize()));
+	player[t]->getCharaSpr()->getPhysicsBody()->setContactTestBitmask(1);
+	player[t]->getCharaSpr()->getPhysicsBody()->setDynamic(false);
+	addChild(player[t]->getCharaSpr(), 3);
 
-Sprite* Games::addPlayer(int x){
-	// ´´½¨Ò»ÕÅÌùÍ¼, ´ÓÌùÍ¼ÖÐÒÔÏñËØµ¥Î»ÇÐ¸î£¬´´½¨¹Ø¼üÖ¡
-	auto texture = Director::getInstance()->getTextureCache()->addImage("$lucia_forward.png");
-	auto frame0 = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(10, 10, 48, 81)));
-
-	auto player = Sprite::createWithSpriteFrame(frame0);
-	player->setScale(2.0, 2.0);
-	player->setPosition(Vec2(x, origin.y + player->getContentSize().height / 2 + altitude));
-	player->setPhysicsBody(PhysicsBody::createBox(player->getContentSize()));
-	player->getPhysicsBody()->setContactTestBitmask(1);
-	player->getPhysicsBody()->setDynamic(false);
-	addChild(player, 3);
-
-	return player;
+	return player[t]->getCharaSpr();
 }
 
 void Games::addEdge(){
@@ -254,45 +258,34 @@ void Games::addEdge(){
 	this->addChild(edge);
 }
 
-void Games::addListener(){
-	// ¼üÅÌÊÂ¼þ
+void Games::addListener()
+{
+	// Â¼Ã¼Ã…ÃŒÃŠÃ‚Â¼Ã¾
 	auto keyboardListener = EventListenerKeyboard::create();
 	keyboardListener->onKeyPressed = CC_CALLBACK_2(Games::onKeyPressed, this);
+	keyboardListener->onKeyReleased = CC_CALLBACK_2(Games::onKeyReleased, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
-	// ´¥ÅöÊÂ¼þ
+	// Â´Â¥Ã…Ã¶ÃŠÃ‚Â¼Ã¾
 	auto contactListener = EventListenerPhysicsContact::create();
 	contactListener->onContactBegin = CC_CALLBACK_1(Games::onConcactBegan, this);
 	_eventDispatcher->addEventListenerWithFixedPriority(contactListener, 1);
+
+	//mouse event listener
+	auto listener = EventListenerTouchOneByOne::create();  //ÂµÂ¥ÂµÃ£Â´Â¥ÃƒÃ¾ÃŠÃ‚Â¼Ã¾EventListenerTouchAllAtOnce
+	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+	listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-void Games::getFrameAction(){
-	// ×ßÂ·
-	auto texture = Director::getInstance()->getTextureCache()->addImage("$lucia_forward.png");
-	walk.reserve(9);
-	for (int i = 0; i < 8; i++) {
-		auto frame = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(68 * i + 10, 10, 48, 81)));
-		walk.pushBack(frame);
-	}
-	auto frame0 = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(10, 10, 48, 81)));
-	walk.pushBack(frame0);
-
-	// ËÀÍö¶¯»­
-	auto texture2 = Director::getInstance()->getTextureCache()->addImage("$lucia_dead.png");
-	dead.reserve(23);
-	for (int i = 0; i < 22; i++) {
-		auto frame = SpriteFrame::createWithTexture(texture2, CC_RECT_PIXELS_TO_POINTS(Rect(79 * i, 0, 79, 90)));
-		dead.pushBack(frame);
-	}
-	dead.pushBack(frame0);
-}
-
-
-
-// ÊµÏÖ¼üÅÌ»Øµ÷
+// ÃŠÂµÃÃ–Â¼Ã¼Ã…ÃŒÂ»Ã˜ÂµÃ·
 void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	auto animation = Animation::createWithSpriteFrames(walk, 0.05f);
+
+	keys[keyCode] = true;
+
+	auto animation = Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f);
 	auto animate = Animate::create(animation);
 	MoveBy* move;
 	int movedis = 20;
@@ -302,15 +295,17 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 	case cocos2d::EventKeyboard::KeyCode::KEY_A:
 		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
 		move = MoveBy::create(0.4, Point(-20, 0));
-		player[0]->setScale(-2.0, 2.0);
-		player[0]->runAction(Spawn::create(animate, move, NULL));
+		player[0]->getCharaSpr()->setScale(-2.0, 2.0);
+		player[0]->getCharaSpr()->runAction(Spawn::create(animate, move, NULL));
+		this->schedule(schedule_selector(Games::moveContine), 0.3f);
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_D:
 		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
 		move = MoveBy::create(0.4, Point(20, 0));
-		player[0]->setScale(2.0, 2.0);
-		player[0]->runAction(Spawn::create(animate, move, NULL));
+		player[0]->getCharaSpr()->setScale(2.0, 2.0);
+		player[0]->getCharaSpr()->runAction(Spawn::create(animate, move, NULL));
+		this->schedule(schedule_selector(Games::moveContine), 0.3f);
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_S:
@@ -320,16 +315,18 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_J:
 		move = MoveBy::create(0.4, Point(-20, 0));
-		player[1]->setScale(2.0, 2.0);
-		player[1]->runAction(Spawn::create(animate, move, NULL));
+		player[1]->getCharaSpr()->setScale(2.0, 2.0);
+		player[1]->getCharaSpr()->runAction(Spawn::create(animate, move, NULL));
 		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
+		this->schedule(schedule_selector(Games::moveContine2), 0.3f);
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_L:
 		move = MoveBy::create(0.4, Point(20, 0));
-		player[1]->setScale(-2.0, 2.0);
-		player[1]->runAction(Spawn::create(animate, move, NULL));
+		player[1]->getCharaSpr()->setScale(-2.0, 2.0);
+		player[1]->getCharaSpr()->runAction(Spawn::create(animate, move, NULL));
 		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
+		this->schedule(schedule_selector(Games::moveContine2), 0.3f);
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_K:
@@ -342,12 +339,71 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 	}
 }
 
+bool Games::isKeyPressed(EventKeyboard::KeyCode keyCode)
+{
+	if (keys[keyCode]) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void Games::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	keys[keyCode] = false;
+
+	if (keyCode == EventKeyboard::KeyCode::KEY_A || keyCode == EventKeyboard::KeyCode::KEY_D)
+	{
+		this->unschedule(schedule_selector(Games::moveContine));
+	}
+
+	if (keyCode == EventKeyboard::KeyCode::KEY_J || keyCode == EventKeyboard::KeyCode::KEY_L)
+	{
+		this->unschedule(schedule_selector(Games::moveContine2));
+	}
+}
+
+void Games::onKeyPressedContinue(EventKeyboard::KeyCode keyCode)
+{
+	int offsetX = 0, offsetY = 0;
+	int offsetX2 = 0, offsetY2 = 0;
+	switch (keyCode) {
+	case EventKeyboard::KeyCode::KEY_A:
+		offsetX = -20;
+		break;
+	case EventKeyboard::KeyCode::KEY_D:
+		offsetX = 20;
+		break;
+	case EventKeyboard::KeyCode::KEY_J:
+		offsetX2 = -20;
+		break;
+	case EventKeyboard::KeyCode::KEY_L:
+		offsetX2 = 20;
+		break;
+	default:
+		offsetY = offsetX = 0;
+		offsetX2 = offsetY2 = 0;
+		break;
+	}
+
+	auto animate = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.04f));
+
+	auto moveTo = MoveTo::create(0.3, Vec2(player[0]->getCharaSpr()->getPositionX() + offsetX, player[0]->getCharaSpr()->getPositionY() + offsetY));
+	player[0]->getCharaSpr()->runAction(Spawn::create(animate, moveTo, NULL));
+
+	auto animate2 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.04f));
+
+	auto moveTo2 = MoveTo::create(0.3, Vec2(player[1]->getCharaSpr()->getPositionX() + offsetX2, player[1]->getCharaSpr()->getPositionY() + offsetY2));
+	player[1]->getCharaSpr()->runAction(Spawn::create(animate2, moveTo2, NULL));
+}
+
 void Games::bullet1fire(){
 	if (bullet1 == NULL) {
 		bullet1 = Sprite::create("bullet1.png");
 		bullet1->setScale(1.5);
 		bullet1->setTag(3);
-		bullet1->setPosition(Vec2(player[0]->getPosition().x + player[0]->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getPosition().y));
+		bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
 		addChild(bullet1, 3);
 		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
 		bullet1->getPhysicsBody()->setVelocity(Vec2(100, 0));
@@ -361,7 +417,7 @@ void Games::bullet2fire(){
 		bullet2 = Sprite::create("bullet2.png");
 		bullet2->setScale(1.5);
 		bullet2->setTag(4);
-		bullet2->setPosition(Vec2(player[1]->getPosition().x - player[1]->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getPosition().y));
+		bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
 		addChild(bullet2, 3);
 		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
 		bullet2->getPhysicsBody()->setVelocity(Vec2(-100, 0));
@@ -371,8 +427,34 @@ void Games::bullet2fire(){
 }
 
 void Games::update(float dt){
-	if (bullet1 != NULL) {
-		
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_D) == false)
+	{
+		player[0]->getCharaSpr()->stopAllActions();
+	}
+
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_J) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_L) == false)
+	{
+		player[1]->getCharaSpr()->stopAllActions();
+	}
+}
+
+void Games::moveContine(float dt)
+{
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A)) {
+		onKeyPressedContinue(EventKeyboard::KeyCode::KEY_A);
+	}
+	else if (isKeyPressed(EventKeyboard::KeyCode::KEY_D)) {
+		onKeyPressedContinue(EventKeyboard::KeyCode::KEY_D);
+	}
+}
+
+void Games::moveContine2(float dt)
+{
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_J)) {
+		onKeyPressedContinue(EventKeyboard::KeyCode::KEY_J);
+	}
+	else if (isKeyPressed(EventKeyboard::KeyCode::KEY_L)) {
+		onKeyPressedContinue(EventKeyboard::KeyCode::KEY_L);
 	}
 }
 
@@ -383,40 +465,45 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 	int tagB = spriteB->getTag();
 
 	/*
-	¸÷¸öÎïÌåµÄTag£º
-	player[0]£º1
-	player[1]£º2
-	edge£º0
-	bullet1£º3
-	bullet2£º4
+	Â¸Ã·Â¸Ã¶ÃŽÃ¯ÃŒÃ¥ÂµÃ„TagÂ£Âº
+	player[0]->getCharaSpr()Â£Âº1
+	player[1]->getCharaSpr()Â£Âº2
+	edgeÂ£Âº0
+	bullet1Â£Âº3
+	bullet2Â£Âº4
 	*/
 
 
-	auto animate = Animate::create(Animation::createWithSpriteFrames(dead, 0.1f));
+	auto animate = Animate::create(Animation::createWithSpriteFrames(player[0]->getDeadFrame(), 0.1f));
 
 	if (tagA == 1 && tagB == 4) {
 		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
 		bullet2->removeFromParent();
 		bullet2 = NULL;
-		player[0]->runAction(animate);
-	} else if (tagA == 4 && tagB == 1) {
+		player[0]->getCharaSpr()->runAction(animate);
+		damage(-20, 0);
+	}
+	else if (tagA == 4 && tagB == 1) {
 		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
 		bullet2->removeFromParent();
 		bullet2 = NULL;
-		player[0]->runAction(animate);
+		player[0]->getCharaSpr()->runAction(animate);
+		damage(-20, 0);
 	}
 
 	if (tagA == 2 && tagB == 3) {
 		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
 		bullet1->removeFromParent();
 		bullet1 = NULL;
-		player[1]->runAction(animate);
+		player[1]->getCharaSpr()->runAction(animate);
+		damage(-20, 1);
 	}
 	else if (tagA == 3 && tagB == 2) {
 		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
 		bullet1->removeFromParent();
 		bullet1 = NULL;
-		player[1]->runAction(animate);
+		player[1]->getCharaSpr()->runAction(animate);
+		damage(-20, 1);
 	}
 
 	if (tagA == 3 && tagB == 4) {
@@ -433,8 +520,23 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 	}
 
 
+	if (tagA == 0 && tagB == 3) {
+		bullet1->removeFromParent();
+		bullet1 = NULL;
+	}
+	else if (tagA == 3 && tagB == 0) {
+		bullet1->removeFromParent();
+		bullet1 = NULL;
+	}
 
-
+	if (tagA == 0 && tagB == 4) {
+		bullet2->removeFromParent();
+		bullet2 = NULL;
+	}
+	else if (tagA == 4 && tagB == 0) {
+		bullet2->removeFromParent();
+		bullet2 = NULL;
+	}
 
 	return true;
 }
@@ -443,7 +545,6 @@ void Games::onBack(Ref* ref)
 {
 	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, HelloWorld::createScene()));
 }
-
 
 void Games::powerRoll(float dt)
 {
@@ -459,13 +560,168 @@ void Games::powerRoll(float dt)
 	}
 }
 
-void Games::shootStone(float power, float direction)
+void Games::shootStone(float power, float direction, Vec2 loc)
 {
-	damage();
+	int pow = 4;
+
+	if (currentPlayer == 0) {
+		log("player1");
+		if (bullet1 == NULL) {
+			bullet1 = Sprite::create("ball.png");
+			//bullet1->setScale(1.5);
+			bullet1->setTag(3);
+			addChild(bullet1, 3);
+			bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
+
+			float vx = 0;
+			float vy = 0;
+
+			if (direction >= 0 && direction < 90) {
+				Vec2 bullet_loc = Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width + bullet1->getContentSize().width, player[0]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet1->setPosition(bullet_loc);
+
+				vx = abs(tmpx / tmpz*power) * pow;
+				vy = -abs(tmpy / tmpz*power) * pow;
+			}
+			else if (direction >= 90 && direction < 180) {
+
+				Vec2 bullet_loc = Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width - bullet1->getContentSize().width, player[0]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet1->setPosition(bullet_loc);
+
+				vx = -abs(tmpx / tmpz*power) * pow;
+				vy = -abs(tmpy / tmpz*power) * pow;
+
+			}
+			else if (direction >= 180 && direction <= 270) {
+				Vec2 bullet_loc = Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width - bullet1->getContentSize().width, player[0]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet1->setPosition(bullet_loc);
+
+				vx = -abs(tmpx / tmpz*power) * pow;
+				vy = abs(tmpy / tmpz*power) * pow;
+			}
+			else if (direction < 0) {
+
+				Vec2 bullet_loc = Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width + bullet1->getContentSize().width, player[0]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+
+				bullet1->setPosition(bullet_loc);
+				vx = abs(tmpx / tmpz*power) * 5;
+				vy = abs(tmpy / tmpz*power) * 5;
+			}
+
+			bullet1->getPhysicsBody()->setVelocity(Vec2(vx, vy));
+			bullet1->getPhysicsBody()->setContactTestBitmask(1);
+
+		}
+
+	}
+	if (currentPlayer == 1) {
+
+		if (bullet2 == NULL) {
+			bullet2 = Sprite::create("ball.png");
+			//bullet2->setScale(1.5);
+			bullet2->setTag(4);
+			addChild(bullet2, 3);
+			bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
+
+			float vx = 0;
+			float vy = 0;
+
+			if (direction >= 0 && direction < 90) {
+				Vec2 bullet_loc = Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width + bullet2->getContentSize().width, player[1]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet2->setPosition(bullet_loc);
+
+				vx = abs(tmpx / tmpz*power) * pow;
+				vy = -abs(tmpy / tmpz*power) * pow;
+			}
+			else if (direction >= 90 && direction < 180) {
+
+				Vec2 bullet_loc = Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width - bullet2->getContentSize().width, player[1]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet2->setPosition(bullet_loc);
+
+				vx = -abs(tmpx / tmpz*power) * pow;
+				vy = -abs(tmpy / tmpz*power) * pow;
+
+			}
+			else if (direction >= 180 && direction <= 270) {
+				Vec2 bullet_loc = Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width - bullet2->getContentSize().width, player[1]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+				bullet2->setPosition(bullet_loc);
+
+				vx = -abs(tmpx / tmpz*power) * pow;
+				vy = abs(tmpy / tmpz*power) * pow;
+			}
+			else if (direction < 0) {
+
+				Vec2 bullet_loc = Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width + bullet2->getContentSize().width, player[1]->getCharaSpr()->getPosition().y);
+				float tmpx = loc.x - bullet_loc.x;
+				float tmpy = loc.y - bullet_loc.y;
+				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
+
+				bullet2->setPosition(bullet_loc);
+				vx = abs(tmpx / tmpz*power) * pow;
+				vy = abs(tmpy / tmpz*power) * pow;
+			}
+
+
+			bullet2->getPhysicsBody()->setVelocity(Vec2(vx, vy));
+			bullet2->getPhysicsBody()->setContactTestBitmask(1);
+		}
+	}
+
 }
 
-
-void Games::damage()
+void Games::damage(int damage, int player)
 {
-	hp1->setPercentage(hp1->getPercentage() - 15);
+	if (player == 0) {
+		if (hp1->getPercentage() + damage > 0 && hp1->getPercentage() + damage <= 100) {
+			hp1->setPercentage(hp1->getPercentage() + damage);
+		}
+		else if (hp1->getPercentage() + damage <= 0) {
+			hp1->setPercentage(0);
+			Director::getInstance()->replaceScene(End::createScene());
+		}
+		else {
+			hp1->setPercentage(100);
+		}
+		// å®žçŽ°è¡€é‡æ¸æ¸å˜åŒ–
+		auto updateHP = ProgressTo::create(0.2, (hp1->getPercentage() + damage));
+		hp1->runAction(updateHP);
+	}
+	else if (player == 1){
+		if (hp2->getPercentage() + damage > 0 && hp2->getPercentage() + damage <= 100) {
+			hp2->setPercentage(hp2->getPercentage() + damage);
+		}
+		else if (hp2->getPercentage() + damage <= 0) {
+			hp2->setPercentage(0);
+			Director::getInstance()->replaceScene(End::createScene());
+		}
+		else {
+			hp2->setPercentage(100);
+		}
+		// å®žçŽ°è¡€é‡æ¸æ¸å˜åŒ–
+		auto updateHP = ProgressTo::create(0.2, (hp2->getPercentage() + damage));
+		hp2->runAction(updateHP);
+	}
+
+
 }

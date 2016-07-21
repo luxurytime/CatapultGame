@@ -4,6 +4,7 @@
 #include "Pistol.h"
 #include "Knight.h"
 #include "Staff.h"
+#include "Boy.h"
 using namespace std;
 
 USING_NS_CC;
@@ -16,6 +17,8 @@ public:
 
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();
+
+	//virtual void onEnter();
 
 
 	// implement the "static create()" method manually
@@ -44,7 +47,7 @@ public:
 	bool isAttacked(int fallPoint, int range);
 
 	//计算伤害
-	void damageCal(Character*, int damage);
+	//void damageCal(Character*, int damage);
 
 	//回合结束，更换玩家，同时设定按钮的Enable等特性
 	void changePlayer();
@@ -62,12 +65,25 @@ public:
 	void playBgm();
 
 	
-	Sprite* addPlayer(int x);// 添加玩家, x=横坐标
+	Sprite* addPlayer(int x, int t);// 添加玩家, x=横坐标
 	void addEdge();// 添加边界框
 	void addListener();// 添加监听器
 	void getFrameAction();// 获得帧动画动作
+	void getFrameAction2();// 获得帧动画动作
+
+	void addHpBar();
 
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+
+	bool isKeyPressed(EventKeyboard::KeyCode keyCode);
+
+	void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+
+	void onKeyPressedContinue(EventKeyboard::KeyCode keyCode);
+
+	void moveContine(float dt);
+
+	void moveContine2(float dt);
 
 	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
 
@@ -79,9 +95,15 @@ public:
 
 	void powerRoll(float dt);
 
-	void shootStone(float power, float direction);
+	void shootStone(float power, float direction, Vec2 loc);
 
-	void damage();
+	void damage(int damage, int player);
+
+	void setPlayTag(int i, int t)
+	{
+		playTag[i] = t;
+	}
+
 
 private:
 
@@ -90,10 +112,14 @@ private:
 	///////////////
 	cocos2d::Size visibleSize;
 	cocos2d::Vec2 origin;
-	cocos2d::Vector<SpriteFrame*> walk;
-	cocos2d::Vector<SpriteFrame*> dead;
+	//cocos2d::Vector<SpriteFrame*> walk;
+	//cocos2d::Vector<SpriteFrame*> dead;
 
-	Sprite* player[2];
+	cocos2d::Vector<SpriteFrame*> walk2;
+	cocos2d::Vector<SpriteFrame*> dead2;
+
+	Character* player[2];
+	int playTag[2];
 	//Sprite* player2;
 
 	Sprite* bullet1;
@@ -110,5 +136,9 @@ private:
 	bool powerDir;
 
 	int currentPlayer;          //正在回合的玩家
+
+	bool already;
+
+	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
 	
 };

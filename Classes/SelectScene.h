@@ -23,15 +23,21 @@ public:
 	// implement the "static create()" method manually
 	CREATE_FUNC(Select);
 
+	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
+
 	///////////////////////////////////
 	///////////////////////////////////
 	///////////////////////////////////
 
-	//检测鼠标点击位置，要现在init添加监听器，用法：touch->getLocation().x为鼠标点击的X坐标，Y同理
-	//点击人物和武器相应位置后，在大框中显示那个人物或武器
 	//bool onTouchBegan(Touch *touch, Event *unused_event);
 
 private:
+
+	Sprite* charac[4];
+	Sprite* bigC[4];
+
+	int player1;
+	int player2;
 
 	//////////////
 	//////////////

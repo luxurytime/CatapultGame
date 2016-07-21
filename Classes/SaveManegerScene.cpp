@@ -33,6 +33,11 @@ bool SaveManeger::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+
+	Sprite* background = Sprite::create("savescene.png");
+	background->setScale(1.05);
+	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	addChild(background, 0);
 	/////////////////////////////
 	// 2. add a menu item with "X" image, which is clicked to quit the program
 	//    you may modify it.
@@ -118,6 +123,5 @@ bool SaveManeger::init()
 
 	return true;
 }
-
 
 

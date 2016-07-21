@@ -33,7 +33,7 @@ bool End::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	Sprite* background = Sprite::create("background3.jpg");
+	Sprite* background = Sprite::create("victory.png");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
 
