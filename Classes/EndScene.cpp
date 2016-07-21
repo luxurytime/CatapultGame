@@ -33,12 +33,13 @@ bool End::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	Sprite* background = Sprite::create("background3.jpg");
+	Sprite* background = Sprite::create("victory.png");
+	background->setScale(1.5);
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
 
 
-	auto label0 = LabelTTF::create("back", "Marker Felt.ttf", 48);
+	auto label0 = LabelTTF::create("back", "Marker Felt.ttf", 30);
 	auto menuItem = MenuItemLabel::create(label0);
 	auto menu = Menu::create(menuItem, nullptr);
 	menuItem->setCallback([&](cocos2d::Ref *sender) {
@@ -49,6 +50,11 @@ bool End::init()
 	addChild(menu, 1);
 
 
+
+
+	//auto label1 = LabelTTF::create("win", "Marker Felt.ttf", 68);
+	//label1->setPosition(visibleSize.width / 2, visibleSize.height / 2);
+	//addChild(label1, 1);
 
 	return true;
 }
