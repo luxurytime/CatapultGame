@@ -1,5 +1,7 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
+#include "GameScene.h"
+#include "StoryGameScene.h"
 
 USING_NS_CC;
 
@@ -75,7 +77,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	register_all_packages();
 
 	// create a scene. it's an autorelease object
-	auto scene = HelloWorld::createScene();
+	//auto scene = HelloWorld::createScene();
+	auto scene = StoryGame::createScene();
 
 	// run
 	director->runWithScene(scene);
@@ -97,4 +100,6 @@ void AppDelegate::applicationWillEnterForeground() {
 
 	// if you use SimpleAudioEngine, it must resume here
 	// SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+
+
 }

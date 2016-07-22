@@ -1,6 +1,10 @@
 #include "cocos2d.h"
 #include <string>
 using namespace std;
+#include "Artillery.h"
+#include "Pistol.h"
+#include "Knight.h"
+#include "Staff.h"
 
 USING_NS_CC;
 
@@ -19,6 +23,27 @@ public:
 	// implement the "static create()" method manually
 	CREATE_FUNC(Select);
 
+	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
+
+	///////////////////////////////////
+	///////////////////////////////////
+	///////////////////////////////////
+
+	//bool onTouchBegan(Touch *touch, Event *unused_event);
+
 private:
+
+	Sprite* charac[4];
+	Sprite* bigC[4];
+
+	int player1;
+	int player2;
+
+	//////////////
+	//////////////
+	//////////////
+	//Arms selectedArm;
+	//Character selectedCharacter;
+
 
 };
