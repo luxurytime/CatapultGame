@@ -1,31 +1,27 @@
-#include "GameScene.h"
+ï»¿#include "GameScene.h"
 #include "SimpleAudioEngine.h"
-#include "EndScene.h"
 #include "HelloWorldScene.h"
+#include "EndScene.h"
 #include <math.h>
 
 using namespace CocosDenshion;
 
-int altitude = 70;
 
 
 USING_NS_CC;
 
 Scene* Games::createScene()
 {
-	// 'scene' is an autorelease object
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
-	scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-	scene->getPhysicsWorld()->setGravity(Point(0, -98));
+	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+	scene->getPhysicsWorld()->setGravity(Point(0, -800));
+	//scene->getPhysicsWorld()->setAutoStep(false);
 
-	// 'layer' is an autorelease object
 	auto layer = Games::create();
 
-	// add layer as a child to scene
 	scene->addChild(layer);
 
-	// return the scene
 	return scene;
 }
 
@@ -39,47 +35,10 @@ bool Games::init()
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
-	Sprite* background = Sprite::create("background2.jpg");
+	Sprite* background = Sprite::create("Background_1.png");
+	background->setScale(1.1);
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
-	//addChild(background, 0);
-
-	//Sprite* player[0] = Sprite::create("player.png");
-	//player[0]->setPosition(visibleSize.width / 4, visibleSize.height * 0.15);
-	//player[0]->setScale(0.1, 0.1);
-	//addChild(player[0], 1);
-
-	//Sprite* player[1] = Sprite::create("player.png");
-	//player[1]->setPosition(visibleSize.width * 0.75, visibleSize.height * 0.15);
-	//player[1]->setScale(0.1, 0.1);
-	//addChild(player[1], 1);
-
-	//Sprite* arrow = Sprite::create("arrow.png");
-	//arrow->setPosition(visibleSize.width / 4+55, visibleSize.height * 0.15+70);
-	//arrow->setScale(0.5, 0.5);
-	//addChild(arrow, 1);
-
-	//Sprite* line = Sprite::create("line2.png");
-	//line->setPosition(visibleSize.width / 2+20, visibleSize.height * 0.35+30);
-	//line->setScale(0.65, 0.65);
-	//addChild(line, 1);
-
-	//Sprite* bomb = Sprite::create("bomb.png");
-	//bomb->setPosition(visibleSize.width / 2, visibleSize.height * 0.4+40);
-	//bomb->setScale(0.4, 0.4);
-	//addChild(bomb, 2);
-
-
-
-	//Sprite* lifep = Sprite::create("lp.png");
-	//lifep->setPosition(50, visibleSize.height-30);
-	//lifep->setScale(0.2, 0.2);
-	//addChild(lifep, 2);
-
-
-	//Sprite* lifep2 = Sprite::create("lp.png");
-	//lifep2->setPosition(visibleSize.width - 50, visibleSize.height - 30);
-	//lifep2->setScale(0.2, 0.2);
-	//addChild(lifep2, 2);
+	addChild(background, 0);
 
 	auto label = LabelTTF::create("MainMenu", "Marker Felt.ttf", 48);
 	auto menuItem = MenuItemLabel::create(label);
@@ -91,47 +50,171 @@ bool Games::init()
 	menuItem->setPosition(visibleSize.width*0.2, visibleSize.height*0.9);
 	//addChild(menu, 1);
 
-	/*MenuItemImage* startMenuItem = MenuItemImage::create("button.png", "button.png", CC_CALLBACK_1(Games::onBack, this));
-	startMenuItem->setPosition(visibleSize.width / 8, visibleSize.height);
-	auto start = Menu::create(startMenuItem, NULL);
-	start->setPosition(Point::ZERO);
-	addChild(start, 1);*/
+	initPlayers();
+	initMap();
+	addEdge();
 
-	powerDir = false;
 
-	currentPlayer = 0;
-
-	player[0] = addPlayer(origin.x + visibleSize.width / 4);
-	player[0]->setTag(1);
-	player[1] = addPlayer(origin.x + visibleSize.width / 4 * 3);
-	player[1]->setFlipX(true);
-	player[1]->setTag(2);
 
 	preloadMusic();
-	//playBgm();
+	////playBgm();
 
-	addEdge();
+
 	addListener();
-	getFrameAction();
-	addHpBar();
+	//addHpBar();
 
 	bullet1 = NULL;
 	bullet2 = NULL;
+	defend1 = NULL;
+	defend2 = NULL;
+
+
+
+	boom.reserve(9);
+	auto frame1 = SpriteFrame::create("3/image 3.png", Rect(0, 0, 300, 300));
+	auto frame2 = SpriteFrame::create("3/image 4.png", Rect(0, 0, 300, 300));
+	auto frame3 = SpriteFrame::create("3/image 5.png", Rect(0, 0, 300, 300));
+	auto frame4 = SpriteFrame::create("3/image 6.png", Rect(0, 0, 300, 300));
+	auto frame5 = SpriteFrame::create("3/image 7.png", Rect(0, 0, 300, 300));
+	auto frame6 = SpriteFrame::create("3/image 8.png", Rect(0, 0, 300, 300));
+	auto frame7 = SpriteFrame::create("3/image 9.png", Rect(0, 0, 300, 300));
+	auto frame8 = SpriteFrame::create("3/image 10.png", Rect(0, 0, 300, 300));
+	auto frame9 = SpriteFrame::create("3/image 11.png", Rect(0, 0, 300, 300));
+	boom.pushBack(frame1);
+	boom.pushBack(frame2);
+	boom.pushBack(frame3);
+	boom.pushBack(frame4);
+	boom.pushBack(frame5);
+	boom.pushBack(frame6);
+	boom.pushBack(frame7);
+	boom.pushBack(frame8);
+	boom.pushBack(frame9);
+
+
+	defend.reserve(12);
+	auto dfframe1 = SpriteFrame::create("2/image  (1).png", Rect(0, 0, 192, 192));
+	auto dfframe2 = SpriteFrame::create("2/image  (2).png", Rect(0, 0, 192, 192));
+	auto dfframe3 = SpriteFrame::create("2/image  (3).png", Rect(0, 0, 192, 192));
+	auto dfframe4 = SpriteFrame::create("2/image  (4).png", Rect(0, 0, 192, 192));
+	auto dfframe5 = SpriteFrame::create("2/image  (5).png", Rect(0, 0, 192, 192));
+	auto dfframe6 = SpriteFrame::create("2/image  (6).png", Rect(0, 0, 192, 192));
+	auto dfframe7 = SpriteFrame::create("2/image  (7).png", Rect(0, 0, 192, 192));
+	auto dfframe8 = SpriteFrame::create("2/image  (8).png", Rect(0, 0, 192, 192));
+	auto dfframe9 = SpriteFrame::create("2/image  (9).png", Rect(0, 0, 192, 192));
+	auto dfframe10 = SpriteFrame::create("2/image  (10).png", Rect(0, 0, 192, 192));
+	auto dfframe11 = SpriteFrame::create("2/image  (11).png", Rect(0, 0, 192, 192));
+	auto dfframe12 = SpriteFrame::create("2/image  (12).png", Rect(0, 0, 192, 192));
+	defend.pushBack(dfframe1);
+	defend.pushBack(dfframe2);
+	defend.pushBack(dfframe3);
+	defend.pushBack(dfframe4);
+	defend.pushBack(dfframe5);
+	defend.pushBack(dfframe6);
+	defend.pushBack(dfframe7);
+	defend.pushBack(dfframe8);
+	defend.pushBack(dfframe9);
+	defend.pushBack(dfframe10);
+	defend.pushBack(dfframe11);
+	defend.pushBack(dfframe12);
+
 
 	scheduleUpdate();
+
+
+
+
+
 
 	return true;
 }
 
-void Games::addHpBar(){
-	//sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	//sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	//sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
+void Games::initPlayers(){
+	player[0] = new Boy();
+	player[1] = new Boy();
 
-	sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
-	//ÑªÌõ1
+	//player[0]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 4, player[0]->getCharaSpr()->getContentSize().height / 2);
+	player[0]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 8, visibleSize.height / 2);
+	player[0]->getCharaSpr()->setTag(0);
+	player[0]->getCharaSpr()->getPhysicsBody()->setCategoryBitmask(0x0001);
+	player[0]->getCharaSpr()->getPhysicsBody()->setCollisionBitmask(0x0001);
+	player[0]->getCharaSpr()->getPhysicsBody()->setContactTestBitmask(0x0001);
+	addChild(player[0]->getCharaSpr(), 2);
+
+	//player[1]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 4 * 3, player[1]->getCharaSpr()->getContentSize().height / 2);
+	player[1]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 4 * 3, visibleSize.height / 2);
+	player[1]->getCharaSpr()->setTag(1);
+	player[1]->getCharaSpr()->setFlipX(true);
+	player[1]->setIsRight(false);
+	player[1]->getCharaSpr()->getPhysicsBody()->setCategoryBitmask(0x0010);
+	player[1]->getCharaSpr()->getPhysicsBody()->setCollisionBitmask(0x0010);
+	player[1]->getCharaSpr()->getPhysicsBody()->setContactTestBitmask(0x0010);
+	addChild(player[1]->getCharaSpr(), 2);
+}
+
+void Games::initMap(){
+
+	auto ground = Sprite::create("Ground.png");
+	ground->setScaleX(1.1);
+	ground->setScaleY(0.5);
+	ground->setPosition(visibleSize.width / 2, 22.5);
+	auto groundBody = PhysicsBody::createBox(ground->getContentSize(), PhysicsMaterial(1.0f, 0.0f, 0.0f));
+	groundBody->setDynamic(false);
+	groundBody->setCategoryBitmask(0x0011);
+	groundBody->setCollisionBitmask(0x0011);
+	groundBody->setContactTestBitmask(0x0011);
+	ground->setPhysicsBody(groundBody);
+	ground->setTag(3);
+	addChild(ground, 2);
+
+	//addObstacle("Platform_long(5).png", 500, 100);
+	addObstacle("Platform_long(4).png", 350, 200);
+	addObstacle("Platform_long(3).png", 700, 200);
+	//addObstacle("Platform_square(3).png", 45, 45);
+	//addObstacle("Platform_square(3).png", 135, 45);
+	addObstacle("Platform_long(1).png", 200, 320);
+	addObstacle("Platform_long(6).png", 540, 400);
+	addObstacle("Platform_long(6).png", 870, 200);
+	addObstacle("Platform_long(6).png", 90, 200);
+
+	addHpBar();
+
+}
+
+void Games::addObstacle(string filename, float x, float y){
+	auto obstacle = Sprite::create(filename);
+	obstacle->setPosition(x, y);
+	Size a(obstacle->getContentSize().width, 3);
+	auto obstacleBody = PhysicsBody::createBox(a, PhysicsMaterial(1.0f, 0.0f, 0.0f));
+	obstacleBody->setPositionOffset(Vec2(0, obstacle->getContentSize().height / 2));
+	obstacleBody->setDynamic(false);
+	obstacleBody->setCategoryBitmask(0x0011);
+	obstacleBody->setCollisionBitmask(0x0011);
+	obstacleBody->setContactTestBitmask(0x0011);
+	obstacle->setPhysicsBody(obstacleBody);
+	obstacle->setTag(3);
+	addChild(obstacle, 2);
+
+	auto obstacle_down = Sprite::create();
+	obstacle_down->setPosition(x, y);
+	Size b(obstacle->getContentSize().width, obstacle->getContentSize().height - 6);
+	auto obstacleDownBody = PhysicsBody::createBox(b, PhysicsMaterial(1.0f, 0.0f, 0.0f));
+	obstacleDownBody->setDynamic(false);
+	obstacleDownBody->setCategoryBitmask(0x0011);
+	obstacleDownBody->setCollisionBitmask(0x0011);
+	obstacleDownBody->setContactTestBitmask(0x0100);
+	obstacle_down->setPhysicsBody(obstacleDownBody);
+	obstacle_down->setTag(7);
+	addChild(obstacle_down, 2);
+
+}
+
+
+void Games::addHpBar(){
+	Sprite* sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	Sprite* sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
+	Sprite* sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
+
+	//è¡€æ¡1
 	hp1 = ProgressTimer::create(sp);
 	hp1->setScaleX(90);
 	hp1->setAnchorPoint(Vec2(0, 0));
@@ -145,7 +228,7 @@ void Games::addHpBar(){
 	sp1->setPosition(Vec2(origin.x + hp1->getContentSize().width, origin.y + visibleSize.height - sp1->getContentSize().height));
 	addChild(sp1, 3);
 
-	//ÑªÌõ2
+	//è¡€æ¡2
 	hp2 = ProgressTimer::create(sp);
 	hp2->setScaleX(90);
 	hp2->setAnchorPoint(Vec2(0, 0));
@@ -153,73 +236,16 @@ void Games::addHpBar(){
 	hp2->setBarChangeRate(Point(1, 0));
 	hp2->setMidpoint(Point(1, 0));
 	hp2->setPercentage(100);
-	hp2->setPosition(Vec2(origin.x + visibleSize.width / 2 +14 * hp2->getContentSize().width, origin.y + visibleSize.height - 2 * hp2->getContentSize().height));
+	hp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 21 * hp2->getContentSize().width, origin.y + visibleSize.height - 2 * hp2->getContentSize().height));
 	addChild(hp2, 4);
 	sp2->setAnchorPoint(Vec2(0, 0));
-	sp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 11 * hp2->getContentSize().width+1.5, origin.y + visibleSize.height - sp2->getContentSize().height));
+	sp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 18 * hp2->getContentSize().width + 1.5, origin.y + visibleSize.height - sp2->getContentSize().height));
 	addChild(sp2, 3);
 	sp2->setFlipX(true);
 }
 
-bool Games::onTouchBegan(Touch *touch, cocos2d::Event *event){
-	auto location = touch->getLocation();
-
-	powerBar = CCProgressTimer::create(Sprite::create("Toge.png"));
-	powerBar->setAnchorPoint(Vec2(0, 0.5));
-	//powerBar->setRotation(-45);
-	if ((location.x - player[currentPlayer]->getPosition().x) < 0)
-	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180 + 180);
-	}
-	else
-	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180);
-	}
-
-	powerBar->setType(ProgressTimer::Type::BAR);
-	powerBar->setMidpoint(Point(0, 0));
-	powerBar->setBarChangeRate(Point(1, 0));
-	powerBar->setPercentage(0);
-
-	powerBar->setPosition(player[currentPlayer]->getPosition().x, player[currentPlayer]->getPosition().y);
-	addChild(powerBar, 3);
-
-	this->schedule(schedule_selector(Games::powerRoll), 0.002f);
-
-	return true;
-	//printf("move");
-}
-
-void Games::onTouchEnded(Touch *touch, cocos2d::Event *event){
-	this->unschedule(schedule_selector(Games::powerRoll));
-	
-
-	shootStone(powerBar->getPercentage(), powerBar->getRotation(), touch->getLocation());
-
-	removeChild(powerBar);
-
-	currentPlayer = 1 - currentPlayer;
-	//printf("move");
-}
-
-void Games::onTouchMoved(Touch *touch, cocos2d::Event *event){
-	auto location = touch->getLocation();
-	if ((location.x - player[currentPlayer]->getPosition().x) < 0)
-	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180 + 180);
-	}
-	else
-	{
-		powerBar->setRotation(-(atan((location.y - player[currentPlayer]->getPosition().y) / (location.x - player[currentPlayer]->getPosition().x))) / 3.1416 * 180);
-	}
-	//this->schedule(schedule_selector(Games::powerRoll), 0.002f);
-	//auto location = touch->getLocation();
-	//test->setPosition(location.x, location.y);
-	//printf("move");
-}
 
 void Games::preloadMusic() {
-	// Ô¤¼ÓÔØÒôÀÖ
 	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("shoot.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("move.mp3");
@@ -231,162 +257,442 @@ void Games::playBgm() {
 }
 
 
-Sprite* Games::addPlayer(int x){
-	// ´´½¨Ò»ÕÅÌùÍ¼, ´ÓÌùÍ¼ÖÐÒÔÏñËØµ¥Î»ÇÐ¸î£¬´´½¨¹Ø¼üÖ¡
-	auto texture = Director::getInstance()->getTextureCache()->addImage("$lucia_forward.png");
-	auto frame0 = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(10, 10, 48, 81)));
-	//auto player1 = AutoPolygon::;
-	auto player = Sprite::createWithSpriteFrame(frame0);
-	player->setScale(2.0, 2.0);
-	player->setPosition(Vec2(x, origin.y + player->getContentSize().height / 2 + altitude));
-	player->setPhysicsBody(PhysicsBody::createBox(player->getContentSize()));
-	player->getPhysicsBody()->setContactTestBitmask(1);
-	player->getPhysicsBody()->setDynamic(false);
-	addChild(player, 3);
-
-	return player;
-}
 
 void Games::addEdge(){
 	auto edge = Sprite::create();
-	auto boundBody = PhysicsBody::createEdgeBox(visibleSize);
-	boundBody->setDynamic(false);
-	boundBody->setContactTestBitmask(1);
-	edge->setPhysicsBody(boundBody);
-	edge->setTag(0);
-	edge->setPosition(Point(visibleSize.width, visibleSize.height));
-	edge->setContentSize(visibleSize);
-	this->addChild(edge);
+	edge->setPosition(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2);
+	Size b;
+	b.setSize(visibleSize.width, visibleSize.height + 6 * player[0]->getCharaSpr()->getContentSize().height);
+	auto edgeBody = PhysicsBody::createEdgeBox(b, PhysicsMaterial(0.0f, 0.0f, 0.0f), 10.0f);
+	//auto edgeBody = PhysicsBody::createEdgeBox(visibleSize, PhysicsMaterial(0.0f, 0.0f, 0.5f), 5.0f);
+	edgeBody->setDynamic(false);
+	edgeBody->setCategoryBitmask(0x0011);
+	edgeBody->setCollisionBitmask(0x0011);
+	edgeBody->setContactTestBitmask(0x0100);
+	edge->setPhysicsBody(edgeBody);
+	edge->setTag(2);
+	addChild(edge, 1);
 }
 
-void Games::addListener(){
-	// ¼üÅÌÊÂ¼þ
+void Games::addListener()
+{
+
 	auto keyboardListener = EventListenerKeyboard::create();
 	keyboardListener->onKeyPressed = CC_CALLBACK_2(Games::onKeyPressed, this);
+	keyboardListener->onKeyReleased = CC_CALLBACK_2(Games::onKeyReleased, this);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(keyboardListener, this);
 
-	// ´¥ÅöÊÂ¼þ
+
 	auto contactListener = EventListenerPhysicsContact::create();
 	contactListener->onContactBegin = CC_CALLBACK_1(Games::onConcactBegan, this);
 	_eventDispatcher->addEventListenerWithFixedPriority(contactListener, 1);
 
-	//mouse event listener
-	auto listener = EventListenerTouchOneByOne::create();  //µ¥µã´¥ÃþÊÂ¼þEventListenerTouchAllAtOnce
-	listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
-	listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
-	listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-}
 
-void Games::getFrameAction(){
-	// ×ßÂ·
-	auto texture = Director::getInstance()->getTextureCache()->addImage("$lucia_forward.png");
-	walk.reserve(9);
-	for (int i = 0; i < 8; i++) {
-		auto frame = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(68 * i + 10, 10, 48, 81)));
-		walk.pushBack(frame);
-	}
-	auto frame0 = SpriteFrame::createWithTexture(texture, CC_RECT_PIXELS_TO_POINTS(Rect(10, 10, 48, 81)));
-	walk.pushBack(frame0);
-
-	// ËÀÍö¶¯»­
-	auto texture2 = Director::getInstance()->getTextureCache()->addImage("$lucia_dead.png");
-	dead.reserve(23);
-	for (int i = 0; i < 22; i++) {
-		auto frame = SpriteFrame::createWithTexture(texture2, CC_RECT_PIXELS_TO_POINTS(Rect(79 * i, 0, 79, 90)));
-		dead.pushBack(frame);
-	}
-	dead.pushBack(frame0);
+	//auto listener = EventListenerTouchOneByOne::create(); 
+	//listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);
+	//listener->onTouchEnded = CC_CALLBACK_2(HelloWorld::onTouchEnded, this);
+	//listener->onTouchMoved = CC_CALLBACK_2(HelloWorld::onTouchMoved, this);
+	//_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
 
-
-// ÊµÏÖ¼üÅÌ»Øµ÷
 void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	auto animation = Animation::createWithSpriteFrames(walk, 0.05f);
-	auto animate = Animate::create(animation);
-	MoveBy* move;
-	int movedis = 20;
+
+	keys[keyCode] = true;
+
+	auto animate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f));
+	auto animate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.05f));
+
+	auto changestate = CallFunc::create([&]() {
+		defend1->removeFromParent();
+		defend1 = NULL;
+	});
+
+	auto changestate1 = CallFunc::create([&]() {
+		defend2->removeFromParent();
+		defend2 = NULL;
+	});
+
 	switch (keyCode)
 	{
 
+		//player1
 	case cocos2d::EventKeyboard::KeyCode::KEY_A:
-		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
-		move = MoveBy::create(0.4, Point(-20, 0));
-		player[0]->setScale(-2.0, 2.0);
-		player[0]->runAction(Spawn::create(animate, move, NULL));
+
+		player[0]->getCharaSpr()->stopAllActions();
+		if (player[0]->getJumpNum() == 0){
+			SimpleAudioEngine::sharedEngine()->playEffect("move.mp3");
+			player[0]->getCharaSpr()->runAction(RepeatForever::create(animate0));
+		}
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_D)){
+			Director::sharedDirector()->getActionManager()->pauseTarget(player[0]->getCharaSpr());
+		}
+		player[0]->setMoveDis(player[0]->getMoveDis() - player[0]->getSpeed());
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_D:
-		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
-		move = MoveBy::create(0.4, Point(20, 0));
-		player[0]->setScale(2.0, 2.0);
-		player[0]->runAction(Spawn::create(animate, move, NULL));
+		player[0]->getCharaSpr()->stopAllActions();
+		if (player[0]->getJumpNum() == 0){
+			SimpleAudioEngine::sharedEngine()->playEffect("move.mp3");
+			player[0]->getCharaSpr()->runAction(RepeatForever::create(animate0));
+		}
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_A)){
+			Director::sharedDirector()->getActionManager()->pauseTarget(player[0]->getCharaSpr());
+		}
+		player[0]->setMoveDis(player[0]->getMoveDis() + player[0]->getSpeed());
 		break;
 
-	case cocos2d::EventKeyboard::KeyCode::KEY_S:
-		SimpleAudioEngine::getInstance()->playEffect("shoot.mp3");
-		bullet1fire();
+	case cocos2d::EventKeyboard::KeyCode::KEY_W:
+		player[0]->getCharaSpr()->stopAllActions();
+		if (player[0]->getJumpNum() == 0) {
+			player[0]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[0]->getCharaSpr()->getPhysicsBody()->getVelocity().x, 400));
+			player[0]->setJumpNum(player[0]->getJumpNum() + 1);
+		}
+		else {
+			if (player[0]->getJumpNum() == 1) {
+				player[0]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[0]->getCharaSpr()->getPhysicsBody()->getVelocity().x, 400));
+				player[0]->setJumpNum(player[0]->getJumpNum() + 1);
+			}
+		}
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_J:
-		move = MoveBy::create(0.4, Point(-20, 0));
-		player[1]->setScale(2.0, 2.0);
-		player[1]->runAction(Spawn::create(animate, move, NULL));
-		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
+		if (bullet1 == NULL){
+			SimpleAudioEngine::sharedEngine()->playEffect("shoot.mp3");
+			if (player[0]->getJumpNum() == 0) {
+				if (player[0]->getIsRight()) {
+					bullet1fire(400, 0);
+				}
+				else {
+					bullet1fire(-400, 0);
+				}
+			}
+			else {
+				if (player[0]->getIsRight()) {
+					bullet1fire(400, -400);
+				}
+				else {
+					bullet1fire(-400, -400);
+				}
+			}
+		}
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_H:
+		//playerdefend1();
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_Y:
+		damage(10, 0);
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_U:
+		if (defend1 == NULL) {
+			defend1 = Sprite::create();
+			defend1->setAnchorPoint(Vec2(0.5, 0.5));
+			defend1->setPosition(player[0]->getCharaSpr()->getPosition());
+			defend1->setTag(8);
+
+			addChild(defend1, 3);
+			Size m(player[0]->getCharaSpr()->getContentSize().width * 2, player[0]->getCharaSpr()->getContentSize().height);
+			auto defend1Body = PhysicsBody::createBox(player[0]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
+			defend1Body->setDynamic(false);
+			defend1Body->setPositionOffset(Vec2(100, 100));
+			defend1Body->setCategoryBitmask(0x01000);
+			defend1Body->setCollisionBitmask(0x01000);
+			defend1Body->setContactTestBitmask(0x01000);
+			defend1->setPhysicsBody(defend1Body);
+
+			defend1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate, NULL));
+		}
+
+		break;
+
+
+		//player2
+	case cocos2d::EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+
+		player[1]->getCharaSpr()->stopAllActions();
+		if (player[1]->getJumpNum() == 0){
+			SimpleAudioEngine::sharedEngine()->playEffect("move.mp3");
+			player[1]->getCharaSpr()->runAction(RepeatForever::create(animate1));
+		}
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW)){
+			Director::sharedDirector()->getActionManager()->pauseTarget(player[1]->getCharaSpr());
+		}
+
+
+		player[1]->setMoveDis(player[1]->getMoveDis() - player[1]->getSpeed());
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+
+		player[1]->getCharaSpr()->stopAllActions();
+		if (player[1]->getJumpNum() == 0){
+			SimpleAudioEngine::sharedEngine()->playEffect("move.mp3");
+			player[1]->getCharaSpr()->runAction(RepeatForever::create(animate1));
+		}
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW)){
+			Director::sharedDirector()->getActionManager()->pauseTarget(player[1]->getCharaSpr());
+		}
+
+
+		player[1]->setMoveDis(player[1]->getMoveDis() + player[1]->getSpeed());
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_UP_ARROW:
+
+		player[1]->getCharaSpr()->stopAllActions();
+		if (player[1]->getJumpNum() == 0) {
+			player[1]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[1]->getCharaSpr()->getPhysicsBody()->getVelocity().x, 400));
+			player[1]->setJumpNum(player[1]->getJumpNum() + 1);
+		}
+		else {
+			if (player[1]->getJumpNum() == 1) {
+				player[1]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[1]->getCharaSpr()->getPhysicsBody()->getVelocity().x, 400));
+				player[1]->setJumpNum(player[1]->getJumpNum() + 1);
+			}
+		}
+
+
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_L:
-		move = MoveBy::create(0.4, Point(20, 0));
-		player[1]->setScale(-2.0, 2.0);
-		player[1]->runAction(Spawn::create(animate, move, NULL));
-		SimpleAudioEngine::getInstance()->playEffect("move.mp3");
-		break;
+		if (bullet2 == NULL){
+			SimpleAudioEngine::sharedEngine()->playEffect("shoot.mp3");
+			if (player[1]->getJumpNum() == 0) {
+				if (player[1]->getIsRight()) {
+					bullet2fire(400, 0);
+				}
+				else {
+					bullet2fire(-400, 0);
+				}
+			}
+			else {
+				if (player[1]->getIsRight()) {
+					bullet2fire(400, -400);
+				}
+				else {
+					bullet2fire(-400, -400);
+				}
+			}
+		}
 
+		break;
 	case cocos2d::EventKeyboard::KeyCode::KEY_K:
-		SimpleAudioEngine::getInstance()->playEffect("shoot.mp3");
-		bullet2fire();
+		//playerdefend2();
 		break;
 
+	case cocos2d::EventKeyboard::KeyCode::KEY_I:
+		damage(10, 1);
+		break;
+
+	case cocos2d::EventKeyboard::KeyCode::KEY_O:
+		if (defend2 == NULL) {
+			defend2 = Sprite::create();
+			defend2->setAnchorPoint(Vec2(0.5, 0.5));
+			defend2->setPosition(player[1]->getCharaSpr()->getPosition());
+			defend2->setTag(8);
+
+			addChild(defend2, 3);
+			Size m(player[1]->getCharaSpr()->getContentSize().width * 2, player[1]->getCharaSpr()->getContentSize().height);
+			auto defend2Body = PhysicsBody::createBox(player[1]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
+			defend2Body->setDynamic(false);
+			defend2Body->setPositionOffset(Vec2(100, 100));
+			defend2Body->setCategoryBitmask(0x10000);
+			defend2Body->setCollisionBitmask(0x10000);
+			defend2Body->setContactTestBitmask(0x10000);
+			defend2->setPhysicsBody(defend2Body);
+
+			defend2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate1, NULL));
+		}
+		break;
 	default:
 		break;
 	}
 }
 
-void Games::bullet1fire(){
-	if (bullet1 == NULL) {
-		bullet1 = Sprite::create("bullet1.png");
-		bullet1->setScale(1.5);
-		bullet1->setTag(3);
-		bullet1->setPosition(Vec2(player[0]->getPosition().x + player[0]->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getPosition().y));
-		addChild(bullet1, 3);
-		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
-		bullet1->getPhysicsBody()->setVelocity(Vec2(100, 0));
-		bullet1->getPhysicsBody()->setContactTestBitmask(1);
-		bullet1->getPhysicsBody()->setGravityEnable(false);
+bool Games::isKeyPressed(EventKeyboard::KeyCode keyCode)
+{
+	if (keys[keyCode]) {
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
-void Games::bullet2fire(){
-	if (bullet2 == NULL) {
-		bullet2 = Sprite::create("bullet2.png");
-		bullet2->setScale(1.5);
-		bullet2->setTag(4);
-		bullet2->setPosition(Vec2(player[1]->getPosition().x - player[1]->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getPosition().y));
-		addChild(bullet2, 3);
-		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
-		bullet2->getPhysicsBody()->setVelocity(Vec2(-100, 0));
-		bullet2->getPhysicsBody()->setContactTestBitmask(1);
-		bullet2->getPhysicsBody()->setGravityEnable(false);
+void Games::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	keys[keyCode] = false;
+
+	auto animate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f));
+	auto animate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.05f));
+
+	switch (keyCode) {
+
+		//player1
+	case cocos2d::EventKeyboard::KeyCode::KEY_A:
+
+		player[0]->setMoveDis(player[0]->getMoveDis() + player[0]->getSpeed());
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_D)) {
+			if (player[0]->getJumpNum() == 0) {
+				player[0]->getCharaSpr()->stopAllActions();
+				player[0]->getCharaSpr()->runAction(RepeatForever::create(animate0));
+			}
+
+		}
+		else {
+			player[0]->getCharaSpr()->stopAllActions();
+		}
+
+
+		break;
+	case cocos2d::EventKeyboard::KeyCode::KEY_D:
+
+
+		player[0]->setMoveDis(player[0]->getMoveDis() - player[0]->getSpeed());
+
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) == 1) {
+			if (player[0]->getJumpNum() == 0) {
+				player[0]->getCharaSpr()->stopAllActions();
+				player[0]->getCharaSpr()->runAction(RepeatForever::create(animate0));
+			}
+		}
+		else {
+			player[0]->getCharaSpr()->stopAllActions();
+		}
+		break;
+
+		//player2
+	case cocos2d::EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+
+		player[1]->setMoveDis(player[1]->getMoveDis() + player[1]->getSpeed());
+
+
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW)) {
+			if (player[1]->getJumpNum() == 0) {
+				player[1]->getCharaSpr()->stopAllActions();
+				player[1]->getCharaSpr()->runAction(RepeatForever::create(animate1));
+			}
+
+		}
+		else {
+			player[1]->getCharaSpr()->stopAllActions();
+		}
+
+		break;
+	case cocos2d::EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+
+
+		player[1]->setMoveDis(player[1]->getMoveDis() - player[1]->getSpeed());
+
+
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW) == 1) {
+			if (player[1]->getJumpNum() == 0) {
+				player[1]->getCharaSpr()->stopAllActions();
+				player[1]->getCharaSpr()->runAction(RepeatForever::create(animate1));
+			}
+		}
+		else {
+			player[1]->getCharaSpr()->stopAllActions();
+		}
+
+
+		break;
+	default:
+		break;
 	}
 }
+
 
 void Games::update(float dt){
-	if (bullet1 != NULL) {
-		
+
+	static float defend1time = 0;
+	static float defend2time = 0;
+
+	/*for (int i = 0; i < 3; ++i)
+	{
+		Director::getInstance()->getRunningScene()->getPhysicsWorld()->step(1 / 180.0f);
+	}*/
+
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_D))) {
+		player[0]->getCharaSpr()->setFlipX(true);
+		player[0]->setIsRight(false);
 	}
+	else if (isKeyPressed(EventKeyboard::KeyCode::KEY_D) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_A))) {
+		player[0]->getCharaSpr()->setFlipX(false);
+		player[0]->setIsRight(true);
+	}
+	if (defend1 != NULL){
+
+		defend1->setPosition(player[0]->getCharaSpr()->getPosition());
+
+		/*if (player[0]->getIsRight()) {
+		defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}
+		else {
+		defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}*/
+		//defend1time += dt;
+		//if (defend1time > 2) {
+		//	defend1time = 0;
+		//	defend1->removeFromParent();
+		//	defend1 = NULL;	
+		//}
+	}
+
+
+	if (defend2 != NULL){
+		defend2->setPosition(player[1]->getCharaSpr()->getPosition());
+		/*if (player[1]->getIsRight()) {
+		defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
+		}
+		else {
+		defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
+		}
+		defend2time += dt;
+		if (defend2time > 2) {
+		defend2time = 0;
+		defend2->removeFromParent();
+		defend2 = NULL;
+		}*/
+	}
+
+
+
+
+
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW))) {
+		player[1]->getCharaSpr()->setFlipX(true);
+		player[1]->setIsRight(false);
+	}
+	else if (isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW))) {
+		player[1]->getCharaSpr()->setFlipX(false);
+		player[1]->setIsRight(true);
+	}
+
+
+	if (player[0]->getCharaSpr()->getPositionY() < origin.y){
+		player[0]->getCharaSpr()->setPosition(player[0]->getCharaSpr()->getPositionX(), visibleSize.height - player[0]->getCharaSpr()->getContentSize().height / 2);
+	}
+	if (player[1]->getCharaSpr()->getPositionY() < origin.y){
+		player[1]->getCharaSpr()->setPosition(player[1]->getCharaSpr()->getPositionX(), visibleSize.height - player[1]->getCharaSpr()->getContentSize().height / 2);
+	}
+	moveDistance();
+
+	win();
+
 }
+
+void Games::moveDistance() {
+	player[0]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[0]->getMoveDis(), player[0]->getCharaSpr()->getPhysicsBody()->getVelocity().y));
+	player[1]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[1]->getMoveDis(), player[1]->getCharaSpr()->getPhysicsBody()->getVelocity().y));
+
+}
+
+
 
 bool Games::onConcactBegan(PhysicsContact& contact) {
 	Sprite* spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
@@ -394,78 +700,91 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 	int tagA = spriteA->getTag();
 	int tagB = spriteB->getTag();
 
+	log("tagA:%d  tagB:%d", tagA, tagB);
+
 	/*
-	¸÷¸öÎïÌåµÄTag£º
-	player[0]£º1
-	player[1]£º2
-	edge£º0
-	bullet1£º3
-	bullet2£º4
+	player[0] 0
+	player[1] 1
+	edge      2
+	obsatle   3
+	bullet1   4
+	bullet2   5
+	obsatle_down 7
 	*/
 
+	auto walkAnimate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f));
+	auto walkAnimate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.05f));
+	auto deadAnimate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getDeadFrame(), 0.1f));
+	auto deadAnimate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getDeadFrame(), 0.1f));
 
-	auto animate = Animate::create(Animation::createWithSpriteFrames(dead, 0.1f));
-
-	if (tagA == 1 && tagB == 4) {
-		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
-		bullet2->removeFromParent();
-		bullet2 = NULL;
-		player[0]->runAction(animate);
-		damage(-20, 0);
-	} else if (tagA == 4 && tagB == 1) {
-		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
-		bullet2->removeFromParent();
-		bullet2 = NULL;
-		player[0]->runAction(animate);
-		damage(-20, 0);
+	if ((tagA == 0 && tagB == 3) || (tagB == 0 && tagA == 3)){
+		player[0]->setJumpNum(0);
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) || isKeyPressed(EventKeyboard::KeyCode::KEY_D)) {
+			player[0]->getCharaSpr()->stopAllActions();
+			player[0]->getCharaSpr()->runAction(RepeatForever::create(walkAnimate0));
+		}
 	}
 
-	if (tagA == 2 && tagB == 3) {
-		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
-		bullet1->removeFromParent();
-		bullet1 = NULL;
-		player[1]->runAction(animate);
-		damage(-20, 1);
-	}
-	else if (tagA == 3 && tagB == 2) {
-		SimpleAudioEngine::getInstance()->playEffect("shout.mp3");
-		bullet1->removeFromParent();
-		bullet1 = NULL;
-		player[1]->runAction(animate);
-		damage(-20, 1);
+	if ((tagA == 1 && tagB == 3) || (tagB == 1 && tagA == 3)){
+		player[1]->setJumpNum(0);
+		if (isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW) || isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW)) {
+			player[1]->getCharaSpr()->stopAllActions();
+			player[1]->getCharaSpr()->runAction(RepeatForever::create(walkAnimate1));
+		}
 	}
 
-	if (tagA == 3 && tagB == 4) {
-		bullet1->removeFromParent();
-		bullet1 = NULL;
-		bullet2->removeFromParent();
-		bullet2 = NULL;
-	}
-	else if (tagA == 4 && tagB == 3) {
-		bullet1->removeFromParent();
-		bullet1 = NULL;
-		bullet2->removeFromParent();
-		bullet2 = NULL;
+	if (tagA == 5 || tagB == 5) {
+		if (bullet2 != NULL){
+			Vec2 loc = bullet2->getPosition();
+
+			bulletBoom1 = Sprite::create();
+			bulletBoom1->setPosition(loc);
+			addChild(bulletBoom1, 3);
+
+			auto changestate = CallFunc::create([&]() {
+				bulletBoom1->removeFromParent();
+				bulletBoom1 = NULL;
+			});
+
+			bulletBoom1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
+
+
+			bullet2->removeFromParent();
+			bullet2 = NULL;
+			if (tagA == 0 || tagB == 0) {
+				SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
+				damage(-20, 0);
+			}
+			else {
+
+			}
+		}
 	}
 
 
-	if (tagA == 0 && tagB == 3) {
-		bullet1->removeFromParent();
-		bullet1 = NULL;
-	}
-	else if (tagA == 3 && tagB == 0) {
-		bullet1->removeFromParent();
-		bullet1 = NULL;
+
+	if (tagA == 4 || tagB == 4) {
+		if (bullet1 != NULL){
+			Vec2 loc = bullet1->getPosition();
+			bulletBoom2 = Sprite::create();
+			bulletBoom2->setPosition(loc);
+			addChild(bulletBoom2, 3);
+
+			auto changestate = CallFunc::create([&]() {
+				bulletBoom2->removeFromParent();
+				bulletBoom2 = NULL;
+			});
+
+			bulletBoom2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
+			bullet1->removeFromParent();
+			bullet1 = NULL;
+			if (tagA == 1 || tagB == 1) {
+				SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
+				damage(-20, 1);
+			}
+		}
 	}
 
-	if (tagA == 0 && tagB == 4) {
-		bullet2->removeFromParent();
-		bullet2 = NULL;
-	}
-	else if (tagA == 4 && tagB == 0) {
-		bullet2->removeFromParent();
-		bullet2 = NULL;
-	}
 
 	return true;
 }
@@ -475,187 +794,125 @@ void Games::onBack(Ref* ref)
 	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, HelloWorld::createScene()));
 }
 
-
-void Games::powerRoll(float dt)
-{
-	if (powerBar->getPercentage() <= 100 && powerDir == true)
-	{
-		powerBar->setPercentage(powerBar->getPercentage() - 0.1);
-		if (powerBar->getPercentage() == 0) powerDir = false;
-	}
-	else
-	{
-		powerBar->setPercentage(powerBar->getPercentage() + 0.1);
-		if (powerBar->getPercentage() == 100) powerDir = true;
+void Games::bullet1fire(float x, float y){
+	if (bullet1 == NULL) {
+		bullet1 = Sprite::create("Ball.png");
+		bullet1->setTag(4);
+		if (player[0]->getIsRight()) {
+			bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}
+		else {
+			bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}
+		addChild(bullet1, 2);
+		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		bullet1->getPhysicsBody()->setVelocity(Vec2(x, y));
+		bullet1->getPhysicsBody()->setCategoryBitmask(0x10110);
+		bullet1->getPhysicsBody()->setCollisionBitmask(0x10110);
+		bullet1->getPhysicsBody()->setContactTestBitmask(0x10110);
+		bullet1->getPhysicsBody()->setGravityEnable(false);
 	}
 }
 
-void Games::shootStone(float power, float direction, Vec2 loc)
-{
-	int pow = 4 ;
-	
-	//if (sp1->getParent() <= 0 || sp2->getParent <= 0) {
+void Games::bullet2fire(float x, float y){
 
-	//}
-	if (currentPlayer == 0) {
-		log("player1");
-		if (bullet1 == NULL) {
-			bullet1 = Sprite::create("ball.png");
-			//bullet1->setScale(1.5);
-			bullet1->setTag(3);
-			addChild(bullet1, 3);
-			bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
 
-			float vx = 0;
-			float vy = 0;
-
-			if (direction >= 0 && direction < 90) {
-				Vec2 bullet_loc = Vec2(player[0]->getPosition().x + player[0]->getContentSize().width + bullet1->getContentSize().width, player[0]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet1->setPosition(bullet_loc);	
-
-				vx = abs(tmpx / tmpz*power) * pow;
-				vy = -abs(tmpy / tmpz*power) * pow;
-			}
-			else if (direction >= 90 && direction < 180) {
-
-				Vec2 bullet_loc = Vec2(player[0]->getPosition().x - player[0]->getContentSize().width - bullet1->getContentSize().width, player[0]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet1->setPosition(bullet_loc);
-
-				vx = -abs(tmpx / tmpz*power) * pow;
-				vy = -abs(tmpy / tmpz*power) * pow;
-
-			}
-			else if (direction >= 180 && direction <= 270) {
-				Vec2 bullet_loc = Vec2(player[0]->getPosition().x - player[0]->getContentSize().width - bullet1->getContentSize().width, player[0]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet1->setPosition(bullet_loc);
-
-				vx = -abs(tmpx / tmpz*power) * pow;
-				vy = abs(tmpy / tmpz*power) * pow;
-			}
-			else if (direction < 0) {
-
-				Vec2 bullet_loc = Vec2(player[0]->getPosition().x + player[0]->getContentSize().width + bullet1->getContentSize().width, player[0]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-
-				bullet1->setPosition(bullet_loc);
-				vx = abs(tmpx / tmpz*power) * 5;
-				vy = abs(tmpy / tmpz*power) * 5;
-			}
-
-			bullet1->getPhysicsBody()->setVelocity(Vec2(vx, vy));
-			bullet1->getPhysicsBody()->setContactTestBitmask(1);
-
+	if (bullet2 == NULL) {
+		bullet2 = Sprite::create("Ball.png");
+		bullet2->setTag(5);
+		if (player[1]->getIsRight()) {
+			bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
 		}
-		
-	}
-	if (currentPlayer == 1) {
-
-		if (bullet2 == NULL) {
-			bullet2 = Sprite::create("ball.png");
-			//bullet2->setScale(1.5);
-			bullet2->setTag(4);
-			addChild(bullet2, 3);
-			bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
-
-			float vx = 0;
-			float vy = 0;
-
-			if (direction >= 0 && direction < 90) {
-				Vec2 bullet_loc = Vec2(player[1]->getPosition().x + player[1]->getContentSize().width + bullet2->getContentSize().width, player[1]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet2->setPosition(bullet_loc);
-
-				vx = abs(tmpx / tmpz*power) * pow;
-				vy = -abs(tmpy / tmpz*power) * pow;
-			}
-			else if (direction >= 90 && direction < 180) {
-
-				Vec2 bullet_loc = Vec2(player[1]->getPosition().x - player[1]->getContentSize().width - bullet2->getContentSize().width, player[1]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet2->setPosition(bullet_loc);
-
-				vx = -abs(tmpx / tmpz*power) * pow;
-				vy = -abs(tmpy / tmpz*power) * pow;
-
-			}
-			else if (direction >= 180 && direction <= 270) {
-				Vec2 bullet_loc = Vec2(player[1]->getPosition().x - player[1]->getContentSize().width - bullet2->getContentSize().width, player[1]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-				bullet2->setPosition(bullet_loc);
-
-				vx = -abs(tmpx / tmpz*power) * pow;
-				vy = abs(tmpy / tmpz*power) * pow;
-			}
-			else if (direction < 0) {
-
-				Vec2 bullet_loc = Vec2(player[1]->getPosition().x + player[1]->getContentSize().width + bullet2->getContentSize().width, player[1]->getPosition().y);
-				float tmpx = loc.x - bullet_loc.x;
-				float tmpy = loc.y - bullet_loc.y;
-				float tmpz = sqrt(tmpx*tmpx + tmpy*tmpy);
-
-				bullet2->setPosition(bullet_loc);
-				vx = abs(tmpx / tmpz*power) * pow;
-				vy = abs(tmpy / tmpz*power) * pow;
-			}
-
-
-			bullet2->getPhysicsBody()->setVelocity(Vec2(vx, vy));
-			bullet2->getPhysicsBody()->setContactTestBitmask(1);
+		else {
+			bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
 		}
+		addChild(bullet2, 2);
+		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		bullet2->getPhysicsBody()->setVelocity(Vec2(x, y));
+		bullet2->getPhysicsBody()->setContactTestBitmask(0x01101);
+		bullet2->getPhysicsBody()->setContactTestBitmask(0x01101);
+		bullet2->getPhysicsBody()->setContactTestBitmask(0x01101);
+		bullet2->getPhysicsBody()->setGravityEnable(false);
 	}
-
 }
 
+void Games::playerdefend1(){
+	if (defend1 == NULL){
+		defend1 = Sprite::create("defend.png");
+		defend1->setScaleX(0.2);
+		defend1->setScaleY(0.05);
+		defend1->setTag(8);
+		if (player[0]->getIsRight()) {
+			defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}
+		else {
+			defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		}
+		addChild(defend1, 2);
+		defend1->setPhysicsBody(PhysicsBody::createBox(defend1->getContentSize(), PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		defend1->getPhysicsBody()->setDynamic(false);
+		defend1->getPhysicsBody()->setCategoryBitmask(0x01000);
+		defend1->getPhysicsBody()->setCollisionBitmask(0x01000);
+		defend1->getPhysicsBody()->setContactTestBitmask(0x01000);
+	}
+}
 
-void Games::damage(int damage, int player)
+void Games::playerdefend2(){
+	if (defend2 == NULL){
+		defend2 = Sprite::create("defend.png");
+		defend2->setScaleX(0.2);
+		defend2->setScaleY(0.05);
+		defend2->setTag(8);
+		if (player[1]->getIsRight()) {
+			defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
+		}
+		else {
+			defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
+		}
+		addChild(defend2, 2);
+		defend2->setPhysicsBody(PhysicsBody::createBox(defend2->getContentSize(), PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		defend2->getPhysicsBody()->setDynamic(false);
+		defend2->getPhysicsBody()->setCategoryBitmask(0x10000);
+		defend2->getPhysicsBody()->setCollisionBitmask(0x10000);
+		defend2->getPhysicsBody()->setContactTestBitmask(0x10000);
+	}
+}
+
+void Games::damage(float damage, int player)
 {
 	if (player == 0) {
-		if (hp1->getPercentage() + damage > 0 && hp1->getPercentage() + damage <= 100) {
-			hp1->setPercentage(hp1->getPercentage() + damage);
+		float tmpdamage = damage;
+		float preBlood = hp1->getPercentage();
+		if (hp1->getPercentage() + damage < 0) {
+			tmpdamage = -hp1->getPercentage();
 		}
-		else if (hp1->getPercentage() + damage <= 0) {
-			hp1->setPercentage(0);
-			Director::getInstance()->replaceScene(End::createScene());
+		else if (hp1->getPercentage() + damage > 100) {
+			tmpdamage = 100 - hp1->getPercentage();
 		}
-		else {
-			hp1->setPercentage(100);
-		}
-		// ÊµÏÖÑªÁ¿½¥½¥±ä»¯
-		auto updateHP = ProgressTo::create(0.2, (hp1->getPercentage() + damage));
+		auto updateHP = ProgressTo::create(0.5, (hp1->getPercentage() + tmpdamage));
 		hp1->runAction(updateHP);
+
 	}
-	else if(player == 1){
-		if (hp2->getPercentage() + damage > 0 && hp2->getPercentage() + damage <= 100) {
-			hp2->setPercentage(hp2->getPercentage() + damage);
+	else if (player == 1){
+		if (hp2->getPercentage() + damage < 0) {
+			damage = -hp2->getPercentage();
 		}
-		else if (hp2->getPercentage() + damage <= 0) {
-			hp2->setPercentage(0);
-			Director::getInstance()->replaceScene(End::createScene());
+		else if (hp2->getPercentage() + damage > 100) {
+			damage = 100 - hp2->getPercentage();
 		}
-		else {
-			hp2->setPercentage(100);
-		}
-		// ÊµÏÖÑªÁ¿½¥½¥±ä»¯
-		auto updateHP = ProgressTo::create(0.2, (hp2->getPercentage() + damage));
+		auto updateHP = ProgressTo::create(0.5, (hp2->getPercentage() + damage));
 		hp2->runAction(updateHP);
 	}
-	
-	
+
+
+}
+
+
+void Games::win(){
+	if (hp1->getPercentage() <= 0) {
+		Director::getInstance()->replaceScene(End::createScene());
+	}
+	else if (hp2->getPercentage() <= 0) {
+		Director::getInstance()->replaceScene(End::createScene());
+	}
 }

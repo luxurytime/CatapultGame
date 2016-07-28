@@ -1,9 +1,10 @@
-#include "cocos2d.h"
+ï»¿#include "cocos2d.h"
 #include <string>
 #include "Artillery.h"
 #include "Pistol.h"
 #include "Knight.h"
 #include "Staff.h"
+#include "Boy.h"
 using namespace std;
 
 USING_NS_CC;
@@ -17,6 +18,8 @@ public:
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();
 
+	//virtual void onEnter();
+
 
 	// implement the "static create()" method manually
 	CREATE_FUNC(Games);
@@ -25,65 +28,74 @@ public:
 	/////////////////////
 	/////////////////////
 
-	//¼ì²âÊó±êµã»÷Î»ÖÃ£¬ÒªÏÖÔÚinitÌí¼Ó¼àÌıÆ÷£¬ÓÃ·¨£ºtouch->getLocation().xÎªÊó±êµã»÷µÄX×ø±ê£¬YÍ¬Àí
-	//bool onTouchBegan(Touch *touch, Event *unused_event);
 
-	//°´ÏÂ¹¥»÷°´Å¥ºó£¬·½ÏòÅÌ¿ªÊ¼°Ú¶¯
-	//virtual void onAttack(Ref* ref);
 
-	//È·¶¨·½Ïòºó£¬·½ÏòÅÌÍ£Ö¹£¬Á¦Á¿Ìõ¿ªÊ¼»¬¶¯
-	//virtual void onDirection(Ref* ref);
 
-	//È·¶¨Á¦Á¿ºó£¬Õ¨µ¯Í¶³ö
-	//virtual void onPower(Ref* ref);
 
-	//»ñÈ¡Õ¨µ¯Âäµã
-	int fallPointCal();
 
-	//ÅĞ¶Ï×Óµ¯ÊÇ·ñÃüÖĞµĞÈË£¬µÚÒ»¸ö²ÎÊıÎªÂäµã£¬µÚ¶ş¸öÎª±¬Õ¨·¶Î§
-	bool isAttacked(int fallPoint, int range);
-
-	//¼ÆËãÉËº¦
+	//Â¼Ã†Ã‹Ã£Ã‰Ã‹ÂºÂ¦
 	//void damageCal(Character*, int damage);
 
-	//»ØºÏ½áÊø£¬¸ü»»Íæ¼Ò£¬Í¬Ê±Éè¶¨°´Å¥µÄEnableµÈÌØĞÔ
-	void changePlayer();
 
-	//Õâ¸öº¯ÊıÃ¿Ò»Ö¡¶¼µ÷ÓÃÒ»´Î£¬¸ù¾İĞèÒªÌí¼ÓÄÚÈİ£¬Èç»ñµÃÕ¨µ¯ÔÚÄ³¸öÊ±¿ÌµÄÎ»ÖÃ
+	//Ã•Ã¢Â¸Ã¶ÂºÂ¯ÃŠÃ½ÃƒÂ¿Ã’Â»Ã–Â¡Â¶Â¼ÂµÃ·Ã“ÃƒÃ’Â»Â´ÃÂ£Â¬Â¸Ã¹Â¾ÃÃÃ¨Ã’ÂªÃŒÃ­Â¼Ã“Ã„ÃšÃˆÃÂ£Â¬ÃˆÃ§Â»Ã±ÂµÃƒÃ•Â¨ÂµÂ¯Ã”ÃšÃ„Â³Â¸Ã¶ÃŠÂ±Â¿ÃŒÂµÃ„ÃÂ»Ã–Ãƒ
 	virtual void update(float dt) override;
 
 	virtual void onBack(Ref* ref);
 
-	//Éä×Óµ¯
-	void bullet1fire();
-	void bullet2fire();
 
 	void preloadMusic();
 	void playBgm();
 
-	
-	Sprite* addPlayer(int x);// Ìí¼ÓÍæ¼Ò, x=ºá×ø±ê
-	void addEdge();// Ìí¼Ó±ß½ç¿ò
-	void addListener();// Ìí¼Ó¼àÌıÆ÷
-	void getFrameAction();// »ñµÃÖ¡¶¯»­¶¯×÷
 
+	void addEdge();// ÃŒÃ­Â¼Ã“Â±ÃŸÂ½Ã§Â¿Ã²
+	void addListener();// ÃŒÃ­Â¼Ã“Â¼Ã ÃŒÃ½Ã†Ã·
 	void addHpBar();
+
+
 
 	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
 
-	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
+	bool isKeyPressed(EventKeyboard::KeyCode keyCode);
+
+	void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+
+
+
+
+
+	/*bool onTouchBegan(Touch *touch, cocos2d::Event *event);
 
 	void onTouchEnded(Touch *touch, cocos2d::Event *event);
 
-	void onTouchMoved(Touch *touch, cocos2d::Event *event);
+	void onTouchMoved(Touch *touch, cocos2d::Event *event);*/
 
 	bool onConcactBegan(PhysicsContact& contact);
 
-	void powerRoll(float dt);
 
-	void shootStone(float power, float direction, Vec2 loc);
 
-	void damage(int damage, int player);
+
+
+
+
+	void setPlayTag(int i, int t)
+	{
+		playTag[i] = t;
+	}
+
+	void bullet1fire(float x, float y);
+	void bullet2fire(float x, float y);
+
+	void playerdefend1();
+	void playerdefend2();
+
+	void damage(float damage, int player);
+
+	void initPlayers();
+	void initMap();
+	void addObstacle(string filename, float x, float y);
+
+	void moveDistance();
+	void win();
 
 
 private:
@@ -93,19 +105,26 @@ private:
 	///////////////
 	cocos2d::Size visibleSize;
 	cocos2d::Vec2 origin;
-	cocos2d::Vector<SpriteFrame*> walk;
-	cocos2d::Vector<SpriteFrame*> dead;
 
-	Sprite* player[2];
-	//Sprite* player2;
+
+	Character* player[2];
+	int playTag[2];
 
 	Sprite* bullet1;
 	Sprite* bullet2;
 
-	Sprite* sp1;
-	Sprite* sp2;
-	Sprite* sp;
-	Sprite* test;
+	Sprite* defend1;
+	Sprite* defend2;
+	Sprite* defend11;
+	Sprite* defend22;
+
+	bool isBlooding1;
+	bool isBlooding2;
+
+	Sprite* bulletBoom1;
+	Sprite* bulletBoom2;
+
+	//bool canMove;
 
 	CCProgressTimer* powerBar;
 
@@ -113,8 +132,9 @@ private:
 
 	CCProgressTimer* hp2;
 
-	bool powerDir;
+	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
 
-	int currentPlayer;          //ÕıÔÚ»ØºÏµÄÍæ¼Ò
-	
+	cocos2d::Vector<SpriteFrame*> boom;
+	cocos2d::Vector<SpriteFrame*> defend;
+
 };

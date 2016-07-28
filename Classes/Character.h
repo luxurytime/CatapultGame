@@ -1,4 +1,4 @@
-#ifndef __CHARACTER_H__
+ï»¿#ifndef __CHARACTER_H__
 #define __CHARACTER_H__
 
 #include "cocos2d.h"
@@ -6,40 +6,108 @@
 
 USING_NS_CC;
 
-class Character {
+class Character{
 public:
-	Character();
+	Character()
+	{
 
-	//ÈËÎïÉúÃüÖµget set
+	}
+
+	//ÃˆÃ‹ÃÃ¯Ã‰ÃºÃƒÃ¼Ã–Âµget set
 	void setHP(int);
 	int getHP();
 
-	//ÈËÎïÉúÃüÌõget set
+	//ÃˆÃ‹ÃÃ¯Ã‰ÃºÃƒÃ¼ÃŒÃµget set
 	void setHPBar();
 	ProgressTimer* getHPBar();
 
-	//ÈËÎïÌùÍ¼get set
-	void setCharaSpr(Sprite*);
-	Sprite* getCharaSpr();
+	//ÃˆÃ‹ÃÃ¯ÃŒÃ¹ÃÂ¼get set
+	void setCharaSpr(Sprite* c)
+	{
+		chara = c;
+	}
 
-	//ÈËÎïÎäÆ÷get set
-	void setArm(Arms);
-	Arms getArm();
+	Sprite* getCharaSpr()
+	{
+		return chara;
+	}
 
-	//ÈËÎïÎ»ÖÃget set
+	//ÃˆÃ‹ÃÃ¯ÃÃ¤Ã†Ã·get set
+	//void setArm(Arms);
+	//Arms getArm();
+
+	//ÃˆÃ‹ÃÃ¯ÃÂ»Ã–Ãƒget set
 	void setPos(float, float);
 	float getPosX();
 	float getPosY();
 
-private:
-	int HP;                        //ÈËÎïÉúÃüÖµ
-	ProgressTimer* hpBar;          //ÈËÎïÉúÃüÌõ
-	Sprite* character;             //ÈËÎïÌùÍ¼
-	Arms arm;                      //ÈËÎïµÄÎäÆ÷
+	void setWalkFrame(Vector<SpriteFrame*> v)
+	{
+		walk = v;
+	}
 
-	//ÈËÎïÎ»ÖÃ
-	float posX;
-	float posY;
+	Vector<SpriteFrame*> getWalkFrame()
+	{
+		return walk;
+	}
+
+	void setDeadFrame(Vector<SpriteFrame*> v)
+	{
+		dead = v;
+	}
+
+	Vector<SpriteFrame*> getDeadFrame()
+	{
+		return dead;
+	}
+
+	void setIsRight(bool ir){
+		isRight = ir;
+	}
+
+	bool getIsRight(){
+		return isRight;
+	}
+
+	void setJumpNum(int jm){
+		jumpNum = jm;
+	}
+
+	int getJumpNum(){
+		return jumpNum;
+	}
+
+	void setSpeed(float s){
+		speed = s;
+	}
+
+	float getSpeed(){
+		return speed;
+	}
+
+	void setMoveDis(float md){
+		movedis = md;
+	}
+
+	float getMoveDis(){
+		return movedis;
+	}
+
+
+private:
+	int HP;                        //ÃˆÃ‹ÃÃ¯Ã‰ÃºÃƒÃ¼Ã–Âµ
+	ProgressTimer* hpBar;          //ÃˆÃ‹ÃÃ¯Ã‰ÃºÃƒÃ¼ÃŒÃµ
+	Sprite* chara;             //ÃˆÃ‹ÃÃ¯ÃŒÃ¹ÃÂ¼
+	//Arms arm;                      //ÃˆÃ‹ÃÃ¯ÂµÃ„ÃÃ¤Ã†Ã·
+
+	bool isRight;
+	int jumpNum;
+	float speed;
+	float movedis;
+
+	cocos2d::Vector<SpriteFrame*> walk;
+	cocos2d::Vector<SpriteFrame*> dead;
+
 };
 
 #endif

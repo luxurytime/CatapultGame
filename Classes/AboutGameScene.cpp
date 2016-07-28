@@ -33,7 +33,8 @@ bool AboutGame::init()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
-	Sprite* background = Sprite::create("background2.jpg");
+	Sprite* background = Sprite::create("aboutscene.png");
+	background->setScale(1.05);
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
 	/////////////////////////////
@@ -41,7 +42,7 @@ bool AboutGame::init()
 	//    you may modify it.
 
 	// add a "close" icon to exit the progress. it's an autorelease object
-	
+
 
 	/////////////////////////////
 	// 3. add your codes below...
