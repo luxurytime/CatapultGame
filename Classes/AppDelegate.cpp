@@ -2,6 +2,7 @@
 #include "HelloWorldScene.h"
 #include "GameScene.h"
 #include "StoryGameScene.h"
+#include "Level2.h"
 
 USING_NS_CC;
 

@@ -17,7 +17,7 @@ Scene* Games::createScene()
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-	scene->getPhysicsWorld()->setGravity(Point(0, -98));
+	scene->getPhysicsWorld()->setGravity(Point(0, -980));
 
 	// 'layer' is an autorelease object
 	auto layer = Games::create();
@@ -281,7 +281,6 @@ void Games::addListener()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
-// ÊµÏÖ¼üÅÌ»Øµ÷
 void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 {
 
@@ -398,46 +397,6 @@ void Games::onKeyPressedContinue(EventKeyboard::KeyCode keyCode)
 
 	auto moveTo2 = MoveTo::create(0.3, Vec2(player[1]->getCharaSpr()->getPositionX() + offsetX2, player[1]->getCharaSpr()->getPositionY() + offsetY2));
 	player[1]->getCharaSpr()->runAction(Spawn::create(animate2, moveTo2, NULL));
-}
-
-void Games::bullet1fire(){
-	if (bullet1 == NULL) {
-		bullet1 = Sprite::create("bullet1.png");
-		bullet1->setScale(1.5);
-		bullet1->setTag(3);
-		bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
-		addChild(bullet1, 3);
-		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
-		bullet1->getPhysicsBody()->setVelocity(Vec2(100, 0));
-		bullet1->getPhysicsBody()->setContactTestBitmask(1);
-		bullet1->getPhysicsBody()->setGravityEnable(false);
-	}
-}
-
-void Games::bullet2fire(){
-	if (bullet2 == NULL) {
-		bullet2 = Sprite::create("bullet2.png");
-		bullet2->setScale(1.5);
-		bullet2->setTag(4);
-		bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
-		addChild(bullet2, 3);
-		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
-		bullet2->getPhysicsBody()->setVelocity(Vec2(-100, 0));
-		bullet2->getPhysicsBody()->setContactTestBitmask(1);
-		bullet2->getPhysicsBody()->setGravityEnable(false);
-	}
-}
-
-void Games::update(float dt){
-	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_D) == false)
-	{
-		player[0]->getCharaSpr()->stopAllActions();
-	}
-
-	if (isKeyPressed(EventKeyboard::KeyCode::KEY_J) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_L) == false)
-	{
-		player[1]->getCharaSpr()->stopAllActions();
-	}
 }
 
 void Games::moveContine(float dt)
@@ -559,6 +518,34 @@ void Games::powerRoll(float dt)
 	{
 		powerBar->setPercentage(powerBar->getPercentage() + 0.1);
 		if (powerBar->getPercentage() == 100) powerDir = true;
+	}
+}
+
+void Games::bullet1fire(){
+	if (bullet1 == NULL) {
+		bullet1 = Sprite::create("bullet1.png");
+		bullet1->setScale(1.5);
+		bullet1->setTag(3);
+		bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
+		addChild(bullet1, 3);
+		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2));
+		bullet1->getPhysicsBody()->setVelocity(Vec2(100, 0));
+		bullet1->getPhysicsBody()->setContactTestBitmask(1);
+		bullet1->getPhysicsBody()->setGravityEnable(false);
+	}
+}
+
+void Games::bullet2fire(){
+	if (bullet2 == NULL) {
+		bullet2 = Sprite::create("bullet2.png");
+		bullet2->setScale(1.5);
+		bullet2->setTag(4);
+		bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
+		addChild(bullet2, 3);
+		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2));
+		bullet2->getPhysicsBody()->setVelocity(Vec2(-100, 0));
+		bullet2->getPhysicsBody()->setContactTestBitmask(1);
+		bullet2->getPhysicsBody()->setGravityEnable(false);
 	}
 }
 
@@ -726,4 +713,16 @@ void Games::damage(int damage, int player)
 	}
 
 
+}
+
+void Games::update(float dt){
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_D) == false)
+	{
+		player[0]->getCharaSpr()->stopAllActions();
+	}
+
+	if (isKeyPressed(EventKeyboard::KeyCode::KEY_J) == false && isKeyPressed(EventKeyboard::KeyCode::KEY_L) == false)
+	{
+		player[1]->getCharaSpr()->stopAllActions();
+	}
 }
