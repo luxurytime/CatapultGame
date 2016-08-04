@@ -9,6 +9,8 @@ public:
 
 	virtual bool init();
 
+	virtual void onEnter();
+
 	void addChara();
 
 	void flyAway();
@@ -22,6 +24,8 @@ public:
 
 	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
 
+	bool isBgm;
+
 private:
 	Sprite* charac[3];
 
@@ -32,6 +36,10 @@ private:
 	int current;
 
 	int selected;
+
+	int pl;
+
+	Sprite* p1;
 
 };
 

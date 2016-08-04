@@ -17,11 +17,17 @@ public:
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();
 
+	virtual void onEnter();
+
 	virtual void onStart(Ref* ref);
 
 	void onMouseMove(Event* event);
 	// implement the "static create()" method manually
 	CREATE_FUNC(Select);
+
+	//virtual void update(float dt) override;
+
+	void dontMove(float dt);
 
 	bool onTouchBegan(Touch *touch, cocos2d::Event *event);
 
@@ -42,6 +48,8 @@ public:
 	void addMap();
 
 	void flyMap();
+
+	bool isBgm;
 
 private:
 
@@ -70,6 +78,13 @@ private:
 	Sprite* p2;
 
 	MenuItemImage* startMenuItem;
+
+	MenuItemImage* startMenuItem2;
+
+	bool ban;
+
+	int pl1;
+	int pl2;
 
 
 };

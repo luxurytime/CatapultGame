@@ -68,14 +68,16 @@ bool SaveManeger::init()
 	//// add the label as a child to this layer
 	//this->addChild(label, 1);
 
-	auto label0 = LabelTTF::create("Back", "Marker Felt.ttf", 48);
+	MenuItemImage* label0 = MenuItemImage::create("Button2/Button_back.png", "Button2/Button_back.png");
 	auto menuItem = MenuItemLabel::create(label0);
 	auto menu = Menu::create(menuItem, nullptr);
 	menuItem->setCallback([&](cocos2d::Ref *sender) {
 		Director::getInstance()->replaceScene(HelloWorld::createScene());
 	});
 	menu->setPosition(Vec2::ZERO);
-	menuItem->setPosition(visibleSize.width / 12, 1 * visibleSize.height / 2);
+	menuItem->setScale(0.15);
+	menuItem->setAnchorPoint(Vec2(0, 1));
+	menuItem->setPosition(0, visibleSize.height);
 	addChild(menu, 1);
 
 	bgmSel = false;

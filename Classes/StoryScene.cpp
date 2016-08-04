@@ -2,6 +2,9 @@
 #include "SimpleAudioEngine.h"
 #include "HelloWorldScene.h"
 #include "StoryGameScene.h"
+
+using namespace CocosDenshion;
+
 USING_NS_CC;
 
 float posSMX[3] = { 250, 480, 710 };
@@ -37,6 +40,8 @@ bool Story::init()
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm13.mp3");
+	SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm13.mp3", true);
 
 	Sprite* background = Sprite::create("storyscene.png");
 	background->setScale(1.05);
@@ -184,14 +189,20 @@ bool Story::init()
 	}
 
 
-	auto label0 = LabelTTF::create("back", "Marker Felt.ttf", 48);
+	MenuItemImage* label0 = MenuItemImage::create("Button2/Button_back.png", "Button2/Button_back.png");
 	auto menuItem = MenuItemLabel::create(label0);
 	auto menu = Menu::create(menuItem, nullptr);
 	menuItem->setCallback([&](cocos2d::Ref *sender) {
-		Director::getInstance()->replaceScene(HelloWorld::createScene());
+		auto scene = HelloWorld::createScene();
+		HelloWorld* temp = HelloWorld::create();
+		temp->isBgm = isBgm;
+		scene->addChild(temp);
+		Director::getInstance()->replaceScene(scene);
 	});
 	menu->setPosition(Vec2::ZERO);
-	menuItem->setPosition(visibleSize.width / 12, 1 * visibleSize.height / 2);
+	menuItem->setScale(0.15);
+	menuItem->setAnchorPoint(Vec2(0, 1));
+	menuItem->setPosition(0, visibleSize.height);
 	addChild(menu, 1);
 
 	auto listener = EventListenerTouchOneByOne::create();
@@ -202,9 +213,22 @@ bool Story::init()
 	return true;
 }
 
+void Story::onEnter()
+{
+	Layer::onEnter();
+	if (isBgm)
+	{
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm13.mp3", true);
+	}
+	if (isBgm == false)
+	{
+		SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+	}
+}
+
 void Story::onStart(Ref* ref)
 {
-	Director::sharedDirector()->replaceScene(TransitionFade::create(1.5f, StoryGame::createScene()));
+	Director::sharedDirector()->replaceScene(TransitionFade::create(1.5f, StoryGame::createScene(pl, true)));
 }
 
 void Story::addChara()
@@ -337,7 +361,21 @@ bool Story::onTouchBegan(Touch *touch, cocos2d::Event *event)
 			selected++;
 			flyAway();
 
-			Sprite* p1 = Sprite::create("texture/1.png");
+			if (current == 0)
+			{
+				p1 = Sprite::create("texture/1.png");
+				pl = 0;
+			}
+			else if (current == 1)
+			{
+				p1 = Sprite::create("texture/2.png");
+				pl = 1;
+			}
+			else if (current == 2)
+			{
+				p1 = Sprite::create("texture/3.png");
+				pl = 2;
+			}
 			p1->setScale(0.7);
 			p1->setOpacity(0);
 			p1->setPosition(300, 300);

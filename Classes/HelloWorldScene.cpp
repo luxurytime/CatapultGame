@@ -38,8 +38,11 @@ bool HelloWorld::init()
 		return false;
 	}
 
-	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm.mp3");
-	SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm.mp3", true);
+	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm14.mp3");
+	SimpleAudioEngine::sharedEngine()->preloadEffect("effect2.mp3");
+	SimpleAudioEngine::sharedEngine()->preloadEffect("effect3.mp3");
+	//SimpleAudioEngine::sharedEngine()->setBackgroundMusicVolume(0.2);
+	//SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm14.mp3", true);
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -106,6 +109,35 @@ bool HelloWorld::init()
 		addChild(star2[i], 2);
 		star2[i]->setOpacity(0);
 	}
+
+	isBgm = true;
+
+	/////////////////////music control
+	menuItem1 = MenuItemImage::create("on2.png", "off2.png");
+	//auto menuItem = MenuItemLabel::create(label0);
+	
+	menuItem1->setCallback([&](cocos2d::Ref *sender) {
+		if (isBgm)
+		{
+			SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+			menuItem1->selected();
+			isBgm = false;
+		}
+		else
+		{
+			SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
+			menuItem1->unselected();
+			isBgm = true;
+		}
+	});
+	
+	menuItem1->setScale(0.25);
+	menuItem1->setAnchorPoint(Vec2(1, 1));
+	menuItem1->setPosition(visibleSize.width, visibleSize.height);
+	auto menu = Menu::create(menuItem1, NULL);
+	menu->setPosition(Vec2::ZERO);
+	addChild(menu, 1);
+	////////////////////////////////
 
 	//startMenuItem = MenuItemImage::create("button.png", "button.png", CC_CALLBACK_1(HelloWorld::onStart, this));
 	//startMenuItem->setPosition(visibleSize.width / 2, visibleSize.height / 2);
@@ -217,6 +249,20 @@ bool HelloWorld::init()
 	return true;
 }
 
+void HelloWorld::onEnter()
+{
+	Layer::onEnter();
+	if (isBgm)
+	{
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm14.mp3", true);
+	}
+	if (isBgm == false)
+	{
+		menuItem1->selected();
+		SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+	}
+}
+
 bool HelloWorld::onTouchBegan(Touch *touch, cocos2d::Event *event)
 {
 	auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -239,11 +285,13 @@ bool HelloWorld::onTouchBegan(Touch *touch, cocos2d::Event *event)
 		mode2->runAction(eo3);
 		bac->runAction(eo4);
 
+		SimpleAudioEngine::sharedEngine()->playEffect("effect2.mp3");
+
 		mode_sel = true;
 	}
 	else if (currentMenu == 1)
 	{
-		Director::getInstance()->replaceScene(TransitionFade::create(0.8f, SaveManeger::createScene()));
+		Director::getInstance()->replaceScene(TransitionFade::create(0.8f, AboutGame::createScene()));
 		
 	}
 	if (mode_sel == true)
@@ -277,6 +325,8 @@ void HelloWorld::onTouchEnded(Touch *touch, cocos2d::Event *event){
 			mode2->runAction(eo3);
 			bac->runAction(eo4);
 
+			SimpleAudioEngine::sharedEngine()->playEffect("effect3.mp3");
+
 			mode_sel = false;
 		}
 	}
@@ -303,17 +353,28 @@ void HelloWorld::onUp(Ref* ref)
 	mode2->runAction(eo3);
 	bac->runAction(eo4);
 
+	SimpleAudioEngine::sharedEngine()->playEffect("effect3.mp3");
+
 	mode_sel = false;
 }
 
 void HelloWorld::onVS(Ref* ref)
 {
-	Director::getInstance()->replaceScene(TransitionFade::create(0.8f, Select::createScene()));
+	auto scene = Select::createScene();
+	Select* temp = Select::create();
+	temp->isBgm = isBgm;
+	scene->addChild(temp);
+	Director::getInstance()->replaceScene(TransitionFade::create(0.8f, scene));
 }
 
 void HelloWorld::onStage(Ref* ref)
 {
-	Director::getInstance()->replaceScene(TransitionFade::create(0.8f, Story::createScene()));
+	auto scene = Story::createScene();
+	Story* temp = Story::create();
+	temp->isBgm = isBgm;
+	scene->addChild(temp);
+	Director::getInstance()->replaceScene(TransitionFade::create(0.8f, scene));
+	//Director::getInstance()->replaceScene(TransitionFade::create(0.8f, Story::createScene()));
 }
 
 void HelloWorld::onMouseMove(Event* event) {

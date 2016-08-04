@@ -5,6 +5,10 @@
 #include "Knight.h"
 #include "Staff.h"
 #include "Boy.h"
+#include "Girl.h"
+#include "Gay.h"
+#include "Dog.h"
+
 using namespace std;
 
 USING_NS_CC;
@@ -12,17 +16,21 @@ USING_NS_CC;
 class Games : public cocos2d::Layer
 {
 public:
+
+	void setPhysicsWorld(PhysicsWorld * world);
+
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(int p1, int p2, bool b);
 
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
-	virtual bool init();
+	virtual bool init(PhysicsWorld* world);
 
 	//virtual void onEnter();
 
 
 	// implement the "static create()" method manually
-	CREATE_FUNC(Games);
+	static Games* create(PhysicsWorld* world);
+	//CREATE_FUNC(Games);
 
 	/////////////////////
 	/////////////////////
@@ -30,14 +38,6 @@ public:
 
 
 
-
-
-
-	//¼ÆËãÉËº¦
-	//void damageCal(Character*, int damage);
-
-
-	//Õâ¸öº¯ÊýÃ¿Ò»Ö¡¶¼µ÷ÓÃÒ»´Î£¬¸ù¾ÝÐèÒªÌí¼ÓÄÚÈÝ£¬Èç»ñµÃÕ¨µ¯ÔÚÄ³¸öÊ±¿ÌµÄÎ»ÖÃ
 	virtual void update(float dt) override;
 
 	virtual void onBack(Ref* ref);
@@ -47,8 +47,8 @@ public:
 	void playBgm();
 
 
-	void addEdge();// Ìí¼Ó±ß½ç¿ò
-	void addListener();// Ìí¼Ó¼àÌýÆ÷
+	void addEdge();
+	void addListener();
 	void addHpBar();
 
 
@@ -72,69 +72,73 @@ public:
 	bool onConcactBegan(PhysicsContact& contact);
 
 
-
-
-
-
-
-	void setPlayTag(int i, int t)
-	{
-		playTag[i] = t;
-	}
-
 	void bullet1fire(float x, float y);
 	void bullet2fire(float x, float y);
 
 	void playerdefend1();
 	void playerdefend2();
 
+	void playermagic1();
+	void playermagic2();
+
 	void damage(float damage, int player);
 
 	void initPlayers();
+	void initFrames();
 	void initMap();
 	void addObstacle(string filename, float x, float y);
+	void initCd();
 
 	void moveDistance();
 	void win();
 
+	void winFrame();
+
+	
+
 
 private:
+	Games();
+	~Games();
 
-	/////////////
-	//////////////
-	///////////////
+	PhysicsWorld* m_world;
 	cocos2d::Size visibleSize;
 	cocos2d::Vec2 origin;
 
-
 	Character* player[2];
-	int playTag[2];
 
 	Sprite* bullet1;
 	Sprite* bullet2;
 
 	Sprite* defend1;
 	Sprite* defend2;
-	Sprite* defend11;
-	Sprite* defend22;
 
-	bool isBlooding1;
-	bool isBlooding2;
+	Sprite* magic1;
+	Sprite* magic2;
 
 	Sprite* bulletBoom1;
 	Sprite* bulletBoom2;
 
-	//bool canMove;
-
-	CCProgressTimer* powerBar;
-
 	CCProgressTimer* hp1;
-
 	CCProgressTimer* hp2;
 
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
 
 	cocos2d::Vector<SpriteFrame*> boom;
 	cocos2d::Vector<SpriteFrame*> defend;
+
+	Sprite* cool1;
+	Sprite* active1;
+	CCProgressTimer* cd1;
+
+	Sprite* cool2;
+	Sprite* active2;
+	CCProgressTimer* cd2;
+
+	int pp1;
+	int pp2;
+	bool isBgm;
+
+	bool winJ;
 
 };

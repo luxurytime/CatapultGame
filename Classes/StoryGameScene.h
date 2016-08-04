@@ -5,6 +5,10 @@
 #include "Knight.h"
 #include "Staff.h"
 #include "Boy.h"
+#include "Girl.h"
+#include "Dog.h"
+#include "Gay.h"
+
 using namespace std;
 
 USING_NS_CC;
@@ -13,7 +17,7 @@ class StoryGame : public cocos2d::Layer
 {
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(int p1, bool b);
 
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();
@@ -28,50 +32,50 @@ public:
 	/////////////////////
 	/////////////////////
 
-	//¼ì²âÊó±êµã»÷Î»ÖÃ£¬ÒªÏÖÔÚinitÌí¼Ó¼àÌýÆ÷£¬ÓÃ·¨£ºtouch->getLocation().xÎªÊó±êµã»÷µÄX×ø±ê£¬YÍ¬Àí
+	//检测鼠标点击位置，要现在init添加监听器，用法：touch->getLocation().x为鼠标点击的X坐标，Y同理
 	//bool onTouchBegan(Touch *touch, Event *unused_event);
 
-	//°´ÏÂ¹¥»÷°´Å¥ºó£¬·½ÏòÅÌ¿ªÊ¼°Ú¶¯
+	//按下攻击按钮后，方向盘开始摆动
 	//virtual void onAttack(Ref* ref);
 
-	//È·¶¨·½Ïòºó£¬·½ÏòÅÌÍ£Ö¹£¬Á¦Á¿Ìõ¿ªÊ¼»¬¶¯
+	//确定方向后，方向盘停止，力量条开始滑动
 	//virtual void onDirection(Ref* ref);
 
-	//È·¶¨Á¦Á¿ºó£¬Õ¨µ¯Í¶³ö
+	//确定力量后，炸弹投出
 	//virtual void onPower(Ref* ref);
 
-	//»ñÈ¡Õ¨µ¯Âäµã
+	//获取炸弹落点
 	int fallPointCal();
 
-	//ÅÐ¶Ï×Óµ¯ÊÇ·ñÃüÖÐµÐÈË£¬µÚÒ»¸ö²ÎÊýÎªÂäµã£¬µÚ¶þ¸öÎª±¬Õ¨·¶Î§
+	//判断子弹是否命中敌人，第一个参数为落点，第二个为爆炸范围
 	bool isAttacked(int fallPoint, int range);
 
-	//¼ÆËãÉËº¦
+	//计算伤害
 	//void damageCal(Character*, int damage);
 
-	//»ØºÏ½áÊø£¬¸ü»»Íæ¼Ò£¬Í¬Ê±Éè¶¨°´Å¥µÄEnableµÈÌØÐÔ
+	//回合结束，更换玩家，同时设定按钮的Enable等特性
 	void changePlayer();
 
-	//Õâ¸öº¯ÊýÃ¿Ò»Ö¡¶¼µ÷ÓÃÒ»´Î£¬¸ù¾ÝÐèÒªÌí¼ÓÄÚÈÝ£¬Èç»ñµÃÕ¨µ¯ÔÚÄ³¸öÊ±¿ÌµÄÎ»ÖÃ
+	//这个函数每一帧都调用一次，根据需要添加内容，如获得炸弹在某个时刻的位置
 	virtual void update(float dt) override;
 
 	virtual void onBack(Ref* ref);
 
-	//Éä×Óµ¯
-	void bullet1fire();
-	void bullet2fire();
+	//射子弹
+	void bulletfire(float x, float y);
 
 	void preloadMusic();
 	void playBgm();
 
 
-	Sprite* addPlayer(int x, int t);// Ìí¼ÓÍæ¼Ò, x=ºá×ø±ê
-	void addEdge();// Ìí¼Ó±ß½ç¿ò
-	void addListener();// Ìí¼Ó¼àÌýÆ÷
-	void getFrameAction();// »ñµÃÖ¡¶¯»­¶¯×÷
-	void getFrameAction2();// »ñµÃÖ¡¶¯»­¶¯×÷
+	Sprite* addPlayer(int x, int t);// 添加玩家, x=横坐标
+	void addEdge();// 添加边界框
+	void addListener();// 添加监听器
+	void getFrameAction();// 获得帧动画动作
+	void getFrameAction2();// 获得帧动画动作
 
 	void addHpBar();
+
 
 	void addEnemy();
 
@@ -93,10 +97,15 @@ public:
 
 	void damage(int damage, int player);
 
+	void end();
+
+	void moveDistance();
 	void setPlayTag(int i, int t)
 	{
 		playTag[i] = t;
 	}
+
+	void winFrame();
 
 
 private:
@@ -117,14 +126,32 @@ private:
 	//Sprite* player2;
 
 	Sprite* bullet1;
-
+	int bulletNum;
 	Sprite* bullet2;
+	Sprite* bullet3;
+	Sprite* bullet4;
+	Sprite* bullet5;
 
-	Sprite* enemy;
+
+
+	Sprite* enemy1;
+	int enemy1HP = 3;
+	Sprite* enemy2;
+	int enemy2HP = 3;
+	Sprite* enemy3;
+	int enemy3HP = 4;
+	Sprite* enemy4;
+	int enemy4HP = 3;
+	Sprite* enemy5;
+	int enemy5HP = 3;
+	Sprite* enemy6;
+	int enemy6HP = 100;
+
 	Sprite* brick;
 	Sprite* pipe;
-
+	bool blinkValue = false;
 	TMXTiledMap* map;
+	TMXLayer* layer;
 	Vector<Sprite*> brickcontainer;
 	Vector<Sprite*> pipecontainer;
 	Vector<Sprite*> enemy1container;
@@ -135,15 +162,24 @@ private:
 	CCProgressTimer* powerBar;
 
 	CCProgressTimer* hp1;
+	CCProgressTimer* hp2;
 
+	Sprite* sp1;
+	Sprite* sp2;
 
+	Label* label;
 
 	bool powerDir;
 
-	int currentPlayer; 
+	int currentPlayer;          //正在回合的玩家
 
 	bool already;
 
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
+
+	int pp1;
+	bool isBgm;
+
+	bool winJ;
 
 };

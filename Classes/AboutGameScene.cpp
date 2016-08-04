@@ -33,7 +33,7 @@ bool AboutGame::init()
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
 
-	Sprite* background = Sprite::create("aboutscene.png");
+	Sprite* background = Sprite::create("guide.png");
 	background->setScale(1.05);
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
@@ -50,7 +50,7 @@ bool AboutGame::init()
 	// add a label shows "Hello World"
 	// create and initialize a label
 
-	auto label = Label::createWithTTF("AboutGameScene", "fonts/STHUPO.ttf", 24);
+	auto label = Label::createWithTTF("Guide", "fonts/STHUPO.ttf", 24);
 
 	// position the label on the center of the screen
 	label->setPosition(Vec2(origin.x + visibleSize.width / 2,
@@ -73,7 +73,7 @@ bool AboutGame::init()
 		Director::getInstance()->replaceScene(HelloWorld::createScene());
 	});
 	menu->setPosition(Vec2::ZERO);
-	menuItem->setPosition(visibleSize.width / 2, 1 * visibleSize.height / 2);
+	menuItem->setPosition(50, 50);
 	addChild(menu, 1);
 
 	return true;

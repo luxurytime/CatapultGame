@@ -62,7 +62,7 @@ bool MapSelect::init()
 	auto item1 = MenuItemLabel::create(label1);
 	item1->setPosition(visibleSize.width / 2, 13 * visibleSize.height / 20);
 	item1->setCallback([&](cocos2d::Ref *sender) {
-		Director::getInstance()->replaceScene(Games::createScene());
+		//Director::getInstance()->replaceScene(Games::createScene());
 	});
 	MenuItems.pushBack(item1);
 
@@ -72,7 +72,7 @@ bool MapSelect::init()
 	auto item2 = MenuItemLabel::create(label2);
 	item2->setPosition(visibleSize.width / 2, 10 * visibleSize.height / 20);
 	item2->setCallback([&](cocos2d::Ref *sender) {
-		Director::getInstance()->replaceScene(Games::createScene());
+		//Director::getInstance()->replaceScene(Games::createScene());
 
 	});
 	MenuItems.pushBack(item2);
@@ -83,7 +83,7 @@ bool MapSelect::init()
 	label3->setColor(Color3B(0, 0, 0));
 	item3->setPosition(visibleSize.width / 2, 7 * visibleSize.height / 20);
 	item3->setCallback([&](cocos2d::Ref *sender) {
-		Director::getInstance()->replaceScene(Games::createScene());
+		//Director::getInstance()->replaceScene(Games::createScene());
 
 	});
 	MenuItems.pushBack(item3);
@@ -94,7 +94,7 @@ bool MapSelect::init()
 	auto item4 = MenuItemLabel::create(label4);
 	item4->setPosition(visibleSize.width / 2, 4 * visibleSize.height / 20);
 	item4->setCallback([&](cocos2d::Ref *sender) {
-		Director::getInstance()->replaceScene(Games::createScene());
+		//Director::getInstance()->replaceScene(Games::createScene());
 
 	});
 	MenuItems.pushBack(item4);
@@ -109,5 +109,5 @@ bool MapSelect::init()
 }
 
 void MapSelect::onStart(Ref* ref) {
-	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, Games::createScene()));
+	//Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, Games::createScene()));
 }

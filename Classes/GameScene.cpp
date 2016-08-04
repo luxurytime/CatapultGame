@@ -6,37 +6,73 @@
 
 using namespace CocosDenshion;
 
-
-
 USING_NS_CC;
 
-Scene* Games::createScene()
+void Games::setPhysicsWorld(PhysicsWorld* world) { m_world = world; }
+
+static int ppp1;
+static int ppp2;
+static bool isBgmp;
+
+Games::Games()
+	: m_world(NULL)
 {
+
+}
+
+Games::~Games()
+{
+}
+
+Scene* Games::createScene(int p1, int p2, bool b)
+{
+	ppp1 = p1;
+	ppp2 = p2;
+	isBgmp = b;
+
 	//auto scene = Scene::create();
 	auto scene = Scene::createWithPhysics();
 	//scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
 	scene->getPhysicsWorld()->setGravity(Point(0, -800));
 	//scene->getPhysicsWorld()->setAutoStep(false);
 
-	auto layer = Games::create();
+	auto layer = Games::create(scene->getPhysicsWorld());
 
 	scene->addChild(layer);
 
 	return scene;
 }
 
-bool Games::init()
+Games* Games::create(PhysicsWorld* world)
+{
+	Games* pRet = new Games();
+	if (pRet && pRet->init(world))
+	{
+		return pRet;
+	}
+	pRet = NULL;
+	return NULL;
+}
+
+bool Games::init(PhysicsWorld* world)
 {
 	if (!Layer::init())
 	{
 		return false;
 	}
+	m_world = world;
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
-	Sprite* background = Sprite::create("Background_1.png");
-	background->setScale(1.1);
+	pp1 = ppp1;
+	pp2 = ppp2;
+	isBgm = isBgmp;
+
+	winJ = true;
+
+	Sprite* background = Sprite::create("back2.jpg");
+	background->setScale(0.65);
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);
 	addChild(background, 0);
 
@@ -52,24 +88,34 @@ bool Games::init()
 
 	initPlayers();
 	initMap();
+	initFrames();
+	initCd();
 	addEdge();
 
 
 
 	preloadMusic();
-	////playBgm();
+	playBgm();
 
 
 	addListener();
-	//addHpBar();
 
 	bullet1 = NULL;
 	bullet2 = NULL;
 	defend1 = NULL;
 	defend2 = NULL;
+	magic1 = NULL;
+	magic2 = NULL;
 
 
+	scheduleUpdate();
 
+	m_world->setAutoStep(false);
+
+	return true;
+}
+
+void Games::initFrames(){
 	boom.reserve(9);
 	auto frame1 = SpriteFrame::create("3/image 3.png", Rect(0, 0, 300, 300));
 	auto frame2 = SpriteFrame::create("3/image 4.png", Rect(0, 0, 300, 300));
@@ -116,21 +162,34 @@ bool Games::init()
 	defend.pushBack(dfframe10);
 	defend.pushBack(dfframe11);
 	defend.pushBack(dfframe12);
-
-
-	scheduleUpdate();
-
-
-
-
-
-
-	return true;
 }
 
 void Games::initPlayers(){
-	player[0] = new Boy();
-	player[1] = new Boy();
+	if (pp1 == 0)
+	{
+		player[0] = new Girl();
+	}
+	else if (pp1 == 1)
+	{
+		player[0] = new Boy();
+	}
+	else if (pp1 == 2)
+	{
+		player[0] = new Dog();
+	}
+
+	if (pp2 == 0)
+	{
+		player[1] = new Girl();
+	}
+	else if (pp2 == 1)
+	{
+		player[1] = new Boy();
+	}
+	else if (pp2 == 2)
+	{
+		player[1] = new Dog();
+	}
 
 	//player[0]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 4, player[0]->getCharaSpr()->getContentSize().height / 2);
 	player[0]->getCharaSpr()->setPosition(origin.x + visibleSize.width / 8, visibleSize.height / 2);
@@ -180,6 +239,66 @@ void Games::initMap(){
 
 }
 
+void Games::initCd(){
+
+	if (pp1 == 0)
+	{
+		cool1 = Sprite::create("Skill/SKill_22.png");
+		active1 = Sprite::create("Skill/SKill_2.png");
+	}
+	else if (pp1 == 1)
+	{
+		cool1 = Sprite::create("Skill/SKill_11.png");
+		active1 = Sprite::create("Skill/SKill_1.png");
+	}
+	else if (pp1 == 2)
+	{
+		cool1 = Sprite::create("Skill/SKill_33.png");
+		active1 = Sprite::create("Skill/SKill_3.png");
+	}
+
+	if (pp2 == 0)
+	{
+		cool2 = Sprite::create("Skill/SKill_22.png");
+		active2 = Sprite::create("Skill/SKill_2.png");
+	}
+	else if (pp2 == 1)
+	{
+		cool2 = Sprite::create("Skill/SKill_11.png");
+		active2 = Sprite::create("Skill/SKill_1.png");
+	}
+	else if (pp2 == 2)
+	{
+		cool2 = Sprite::create("Skill/SKill_33.png");
+		active2 = Sprite::create("Skill/SKill_3.png");
+	}
+
+	cool1->setScale(0.8);
+	active1->setScale(0.8);
+	
+	cool1->setPosition(50, visibleSize.height - 110);
+	addChild(cool1, 0);
+	cd1 = ProgressTimer::create(active1);
+	cd1->setType(ProgressTimerType::RADIAL);
+	cd1->setPercentage(100);
+	//cd1->setPosition(visibleSize.width / 4, visibleSize.height * 3 / 4);
+	cd1->setPosition(50, visibleSize.height-110);
+	addChild(cd1, 1);
+	cd1->setScale(0.8);
+
+	cool2->setScale(0.8);
+	active2->setScale(0.8);
+
+	cool2->setPosition(visibleSize.width - 50, visibleSize.height - 110);
+	addChild(cool2, 0);
+	cd2 = ProgressTimer::create(active2);
+	cd2->setType(ProgressTimerType::RADIAL);
+	cd2->setPercentage(100);
+	cd2->setPosition(visibleSize.width-50, visibleSize.height - 110);
+	addChild(cd2, 1);
+	cd2->setScale(0.8);
+}
+
 void Games::addObstacle(string filename, float x, float y){
 	auto obstacle = Sprite::create(filename);
 	obstacle->setPosition(x, y);
@@ -210,53 +329,63 @@ void Games::addObstacle(string filename, float x, float y){
 
 
 void Games::addHpBar(){
-	Sprite* sp1 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	Sprite* sp2 = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(0, 320, 420, 47)));
-	Sprite* sp = Sprite::create("hp.png", CC_RECT_PIXELS_TO_POINTS(Rect(610, 362, 4, 16)));
+	Sprite* sp1 = Sprite::create("HP_1.png");
+	Sprite* sp2 = Sprite::create("HP_3.png");
+	Sprite* sp = Sprite::create("HP_2.png");
 
 	//血条1
 	hp1 = ProgressTimer::create(sp);
-	hp1->setScaleX(90);
+	//hp1->setScaleX(90);
 	hp1->setAnchorPoint(Vec2(0, 0));
 	hp1->setType(ProgressTimerType::BAR);
 	hp1->setBarChangeRate(Point(1, 0));
 	hp1->setMidpoint(Point(0, 1));
 	hp1->setPercentage(100);
-	hp1->setPosition(Vec2(origin.x + 14 * hp1->getContentSize().width, origin.y + visibleSize.height - 2 * hp1->getContentSize().height));
-	addChild(hp1, 4);
+	//hp1->setPosition(Vec2(origin.x + 14 * hp1->getContentSize().width, origin.y + visibleSize.height - 2 * hp1->getContentSize().height));
+	
+	addChild(hp1, 1);
 	sp1->setAnchorPoint(Vec2(0, 0));
-	sp1->setPosition(Vec2(origin.x + hp1->getContentSize().width, origin.y + visibleSize.height - sp1->getContentSize().height));
-	addChild(sp1, 3);
+	
+	//sp1->setPosition(Vec2(origin.x + hp1->getContentSize().width, origin.y + visibleSize.height - sp1->getContentSize().height));
+	addChild(sp1, 0);
+
+	hp1->setPosition(Vec2(origin.x + 112, origin.y + visibleSize.height - 50));
+	sp1->setPosition(Vec2(origin.x + 10, origin.y + visibleSize.height - sp1->getContentSize().height));
 
 	//血条2
 	hp2 = ProgressTimer::create(sp);
-	hp2->setScaleX(90);
+	//hp2->setScaleX(90);
 	hp2->setAnchorPoint(Vec2(0, 0));
 	hp2->setType(ProgressTimerType::BAR);
 	hp2->setBarChangeRate(Point(1, 0));
 	hp2->setMidpoint(Point(1, 0));
 	hp2->setPercentage(100);
 	hp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 21 * hp2->getContentSize().width, origin.y + visibleSize.height - 2 * hp2->getContentSize().height));
-	addChild(hp2, 4);
+	addChild(hp2, 1);
 	sp2->setAnchorPoint(Vec2(0, 0));
 	sp2->setPosition(Vec2(origin.x + visibleSize.width / 2 + 18 * hp2->getContentSize().width + 1.5, origin.y + visibleSize.height - sp2->getContentSize().height));
-	addChild(sp2, 3);
-	sp2->setFlipX(true);
+	addChild(sp2, 0);
+
+
+	hp2->setPosition(Vec2(origin.x + visibleSize.width/2+112+10, origin.y + visibleSize.height - 50));
+	sp2->setPosition(Vec2(origin.x + visibleSize.width/2 +32+10, origin.y + visibleSize.height - sp1->getContentSize().height));
+	//sp2->setFlipX(true);
 }
 
 
 void Games::preloadMusic() {
-	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm.mp3");
+	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("bgm11.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("shoot.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("move.mp3");
 	SimpleAudioEngine::getInstance()->preloadEffect("shout.mp3");
 }
 
 void Games::playBgm() {
-	SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm.mp3", true);
+	if (isBgm)
+	{
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("bgm11.mp3", true);
+	}
 }
-
-
 
 void Games::addEdge(){
 	auto edge = Sprite::create();
@@ -304,15 +433,9 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 	auto animate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f));
 	auto animate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.05f));
 
-	auto changestate = CallFunc::create([&]() {
-		defend1->removeFromParent();
-		defend1 = NULL;
-	});
 
-	auto changestate1 = CallFunc::create([&]() {
-		defend2->removeFromParent();
-		defend2 = NULL;
-	});
+
+
 
 	switch (keyCode)
 	{
@@ -357,7 +480,7 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 		}
 		break;
 
-	case cocos2d::EventKeyboard::KeyCode::KEY_J:
+	case cocos2d::EventKeyboard::KeyCode::KEY_G:
 		if (bullet1 == NULL){
 			SimpleAudioEngine::sharedEngine()->playEffect("shoot.mp3");
 			if (player[0]->getJumpNum() == 0) {
@@ -380,33 +503,25 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 		break;
 
 	case cocos2d::EventKeyboard::KeyCode::KEY_H:
-		//playerdefend1();
-		break;
-
-	case cocos2d::EventKeyboard::KeyCode::KEY_Y:
-		damage(10, 0);
-		break;
-
-	case cocos2d::EventKeyboard::KeyCode::KEY_U:
-		if (defend1 == NULL) {
-			defend1 = Sprite::create();
-			defend1->setAnchorPoint(Vec2(0.5, 0.5));
-			defend1->setPosition(player[0]->getCharaSpr()->getPosition());
-			defend1->setTag(8);
-
-			addChild(defend1, 3);
-			Size m(player[0]->getCharaSpr()->getContentSize().width * 2, player[0]->getCharaSpr()->getContentSize().height);
-			auto defend1Body = PhysicsBody::createBox(player[0]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
-			defend1Body->setDynamic(false);
-			defend1Body->setPositionOffset(Vec2(100, 100));
-			defend1Body->setCategoryBitmask(0x01000);
-			defend1Body->setCollisionBitmask(0x01000);
-			defend1Body->setContactTestBitmask(0x01000);
-			defend1->setPhysicsBody(defend1Body);
-
-			defend1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate, NULL));
+		if (cd1->getPercentage() == 100) {
+			cd1->setPercentage(0);
+			if (pp1 == 0)
+			{
+				damage(25, 0);
+			}
+			else if (pp1 == 1)
+			{
+				playermagic1();
+			}
+			else if (pp1 == 2)
+			{
+				playerdefend1();
+			}
+			
+			
+			auto cdAct = ProgressTo::create(8.0, 100);
+			cd1->runAction(cdAct);
 		}
-
 		break;
 
 
@@ -458,7 +573,7 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 
 		break;
 
-	case cocos2d::EventKeyboard::KeyCode::KEY_L:
+	case cocos2d::EventKeyboard::KeyCode::KEY_K:
 		if (bullet2 == NULL){
 			SimpleAudioEngine::sharedEngine()->playEffect("shoot.mp3");
 			if (player[1]->getJumpNum() == 0) {
@@ -480,34 +595,29 @@ void Games::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 		}
 
 		break;
-	case cocos2d::EventKeyboard::KeyCode::KEY_K:
-		//playerdefend2();
-		break;
+	case cocos2d::EventKeyboard::KeyCode::KEY_L:
+		if (cd2->getPercentage() == 100) {
+			cd2->setPercentage(0);
+			if (pp2 == 0)
+			{
+				damage(25, 1);
+			}
+			else if (pp2 == 1)
+			{
+				playermagic2();
+			}
+			else if (pp2 == 2)
+			{
+				playerdefend2();
+			}
 
-	case cocos2d::EventKeyboard::KeyCode::KEY_I:
-		damage(10, 1);
-		break;
-
-	case cocos2d::EventKeyboard::KeyCode::KEY_O:
-		if (defend2 == NULL) {
-			defend2 = Sprite::create();
-			defend2->setAnchorPoint(Vec2(0.5, 0.5));
-			defend2->setPosition(player[1]->getCharaSpr()->getPosition());
-			defend2->setTag(8);
-
-			addChild(defend2, 3);
-			Size m(player[1]->getCharaSpr()->getContentSize().width * 2, player[1]->getCharaSpr()->getContentSize().height);
-			auto defend2Body = PhysicsBody::createBox(player[1]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
-			defend2Body->setDynamic(false);
-			defend2Body->setPositionOffset(Vec2(100, 100));
-			defend2Body->setCategoryBitmask(0x10000);
-			defend2Body->setCollisionBitmask(0x10000);
-			defend2Body->setContactTestBitmask(0x10000);
-			defend2->setPhysicsBody(defend2Body);
-
-			defend2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate1, NULL));
+			
+			auto cdAct = ProgressTo::create(8.0, 100);
+			cd2->runAction(cdAct);
 		}
+
 		break;
+
 	default:
 		break;
 	}
@@ -609,13 +719,12 @@ void Games::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 
 void Games::update(float dt){
 
-	static float defend1time = 0;
-	static float defend2time = 0;
 
-	/*for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 3; ++i)
 	{
-		Director::getInstance()->getRunningScene()->getPhysicsWorld()->step(1 / 180.0f);
-	}*/
+		//Director::getInstance()->getRunningScene()->getPhysicsWorld()->step(1 / 180.0f);
+		m_world->step(1 / 180.0f);
+	}
 
 	if (isKeyPressed(EventKeyboard::KeyCode::KEY_A) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_D))) {
 		player[0]->getCharaSpr()->setFlipX(true);
@@ -625,44 +734,6 @@ void Games::update(float dt){
 		player[0]->getCharaSpr()->setFlipX(false);
 		player[0]->setIsRight(true);
 	}
-	if (defend1 != NULL){
-
-		defend1->setPosition(player[0]->getCharaSpr()->getPosition());
-
-		/*if (player[0]->getIsRight()) {
-		defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
-		}
-		else {
-		defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
-		}*/
-		//defend1time += dt;
-		//if (defend1time > 2) {
-		//	defend1time = 0;
-		//	defend1->removeFromParent();
-		//	defend1 = NULL;	
-		//}
-	}
-
-
-	if (defend2 != NULL){
-		defend2->setPosition(player[1]->getCharaSpr()->getPosition());
-		/*if (player[1]->getIsRight()) {
-		defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
-		}
-		else {
-		defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
-		}
-		defend2time += dt;
-		if (defend2time > 2) {
-		defend2time = 0;
-		defend2->removeFromParent();
-		defend2 = NULL;
-		}*/
-	}
-
-
-
-
 
 	if (isKeyPressed(EventKeyboard::KeyCode::KEY_LEFT_ARROW) && (!isKeyPressed(EventKeyboard::KeyCode::KEY_RIGHT_ARROW))) {
 		player[1]->getCharaSpr()->setFlipX(true);
@@ -674,14 +745,14 @@ void Games::update(float dt){
 	}
 
 
-	if (player[0]->getCharaSpr()->getPositionY() < origin.y){
-		player[0]->getCharaSpr()->setPosition(player[0]->getCharaSpr()->getPositionX(), visibleSize.height - player[0]->getCharaSpr()->getContentSize().height / 2);
+	if (defend1 != NULL){
+		defend1->setPosition(player[0]->getCharaSpr()->getPosition());
 	}
-	if (player[1]->getCharaSpr()->getPositionY() < origin.y){
-		player[1]->getCharaSpr()->setPosition(player[1]->getCharaSpr()->getPositionX(), visibleSize.height - player[1]->getCharaSpr()->getContentSize().height / 2);
+	if (defend2 != NULL){
+		defend2->setPosition(player[1]->getCharaSpr()->getPosition());
 	}
-	moveDistance();
 
+	moveDistance();
 	win();
 
 }
@@ -689,10 +760,7 @@ void Games::update(float dt){
 void Games::moveDistance() {
 	player[0]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[0]->getMoveDis(), player[0]->getCharaSpr()->getPhysicsBody()->getVelocity().y));
 	player[1]->getCharaSpr()->getPhysicsBody()->setVelocity(Vec2(player[1]->getMoveDis(), player[1]->getCharaSpr()->getPhysicsBody()->getVelocity().y));
-
 }
-
-
 
 bool Games::onConcactBegan(PhysicsContact& contact) {
 	Sprite* spriteA = (Sprite*)contact.getShapeA()->getBody()->getNode();
@@ -710,12 +778,14 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 	bullet1   4
 	bullet2   5
 	obsatle_down 7
+	defend1 8
+	defend2 8
+	magic1 9
+	magic2 10
 	*/
 
 	auto walkAnimate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getWalkFrame(), 0.05f));
 	auto walkAnimate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getWalkFrame(), 0.05f));
-	auto deadAnimate0 = Animate::create(Animation::createWithSpriteFrames(player[0]->getDeadFrame(), 0.1f));
-	auto deadAnimate1 = Animate::create(Animation::createWithSpriteFrames(player[1]->getDeadFrame(), 0.1f));
 
 	if ((tagA == 0 && tagB == 3) || (tagB == 0 && tagA == 3)){
 		player[0]->setJumpNum(0);
@@ -737,26 +807,24 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 		if (bullet2 != NULL){
 			Vec2 loc = bullet2->getPosition();
 
-			bulletBoom1 = Sprite::create();
-			bulletBoom1->setPosition(loc);
-			addChild(bulletBoom1, 3);
+			bulletBoom2 = Sprite::create();
+			bulletBoom2->setPosition(loc);
+			addChild(bulletBoom2, 3);
 
 			auto changestate = CallFunc::create([&]() {
-				bulletBoom1->removeFromParent();
-				bulletBoom1 = NULL;
+				bulletBoom2->removeFromParent();
+				bulletBoom2 = NULL;
+				bullet2 = NULL;
 			});
 
-			bulletBoom1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
+			bulletBoom2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
 
 
 			bullet2->removeFromParent();
-			bullet2 = NULL;
+
 			if (tagA == 0 || tagB == 0) {
 				SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
-				damage(-20, 0);
-			}
-			else {
-
+				damage(-25, 0);
 			}
 		}
 	}
@@ -766,25 +834,48 @@ bool Games::onConcactBegan(PhysicsContact& contact) {
 	if (tagA == 4 || tagB == 4) {
 		if (bullet1 != NULL){
 			Vec2 loc = bullet1->getPosition();
-			bulletBoom2 = Sprite::create();
-			bulletBoom2->setPosition(loc);
-			addChild(bulletBoom2, 3);
+			bulletBoom1 = Sprite::create();
+			bulletBoom1->setPosition(loc);
+			addChild(bulletBoom1, 3);
 
 			auto changestate = CallFunc::create([&]() {
-				bulletBoom2->removeFromParent();
-				bulletBoom2 = NULL;
+				bulletBoom1->removeFromParent();
+				bulletBoom1 = NULL;
+				bullet1 = NULL;
 			});
 
-			bulletBoom2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
+			bulletBoom1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(boom, 0.09f)), changestate, NULL));
 			bullet1->removeFromParent();
-			bullet1 = NULL;
+
 			if (tagA == 1 || tagB == 1) {
 				SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
-				damage(-20, 1);
+				damage(-25, 1);
 			}
 		}
 	}
 
+	if (tagA == 9 || tagB == 9) {
+		if (tagA == 1 || tagB == 1) {
+			SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
+			damage(-25, 1);
+		}
+		if (magic1 != NULL) {
+			magic1->removeFromParent();
+			magic1 = NULL;
+		}
+	}
+
+	if (tagA == 10 || tagB == 10) {
+		if (tagA == 0 || tagB == 0) {
+			SimpleAudioEngine::sharedEngine()->playEffect("shout.mp3");
+			damage(-25, 0);
+		}
+		if (magic2 != NULL) {
+			magic2->removeFromParent();
+			magic2 = NULL;
+		}
+		
+	}
 
 	return true;
 }
@@ -796,7 +887,7 @@ void Games::onBack(Ref* ref)
 
 void Games::bullet1fire(float x, float y){
 	if (bullet1 == NULL) {
-		bullet1 = Sprite::create("Ball.png");
+		bullet1 = Sprite::create("image 1.png");
 		bullet1->setTag(4);
 		if (player[0]->getIsRight()) {
 			bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
@@ -805,7 +896,7 @@ void Games::bullet1fire(float x, float y){
 			bullet1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - bullet1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
 		}
 		addChild(bullet1, 2);
-		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 2, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		bullet1->setPhysicsBody(PhysicsBody::createCircle(bullet1->getContentSize().width / 8, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
 		bullet1->getPhysicsBody()->setVelocity(Vec2(x, y));
 		bullet1->getPhysicsBody()->setCategoryBitmask(0x10110);
 		bullet1->getPhysicsBody()->setCollisionBitmask(0x10110);
@@ -818,7 +909,8 @@ void Games::bullet2fire(float x, float y){
 
 
 	if (bullet2 == NULL) {
-		bullet2 = Sprite::create("Ball.png");
+		bullet2 = Sprite::create("image 1.png");
+		bullet2->setFlipX(true);
 		bullet2->setTag(5);
 		if (player[1]->getIsRight()) {
 			bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
@@ -827,7 +919,7 @@ void Games::bullet2fire(float x, float y){
 			bullet2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - bullet2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
 		}
 		addChild(bullet2, 2);
-		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 2, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
+		bullet2->setPhysicsBody(PhysicsBody::createCircle(bullet2->getContentSize().width / 8, PhysicsMaterial(0.0f, 0.0f, 0.0f)));
 		bullet2->getPhysicsBody()->setVelocity(Vec2(x, y));
 		bullet2->getPhysicsBody()->setContactTestBitmask(0x01101);
 		bullet2->getPhysicsBody()->setContactTestBitmask(0x01101);
@@ -837,45 +929,81 @@ void Games::bullet2fire(float x, float y){
 }
 
 void Games::playerdefend1(){
-	if (defend1 == NULL){
-		defend1 = Sprite::create("defend.png");
-		defend1->setScaleX(0.2);
-		defend1->setScaleY(0.05);
+
+	auto changestate = CallFunc::create([&]() {
+		defend1->removeFromParent();
+		defend1 = NULL;
+	});
+
+	if (defend1 == NULL) {
+		defend1 = Sprite::create();
+		defend1->setAnchorPoint(Vec2(0.5, 0.5));
+		defend1->setPosition(player[0]->getCharaSpr()->getPosition());
 		defend1->setTag(8);
-		if (player[0]->getIsRight()) {
-			defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x + player[0]->getCharaSpr()->getContentSize().width / 2 + defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
-		}
-		else {
-			defend1->setPosition(Vec2(player[0]->getCharaSpr()->getPosition().x - player[0]->getCharaSpr()->getContentSize().width / 2 - defend1->getContentSize().width / 2, player[0]->getCharaSpr()->getPosition().y));
-		}
-		addChild(defend1, 2);
-		defend1->setPhysicsBody(PhysicsBody::createBox(defend1->getContentSize(), PhysicsMaterial(0.0f, 0.0f, 0.0f)));
-		defend1->getPhysicsBody()->setDynamic(false);
-		defend1->getPhysicsBody()->setCategoryBitmask(0x01000);
-		defend1->getPhysicsBody()->setCollisionBitmask(0x01000);
-		defend1->getPhysicsBody()->setContactTestBitmask(0x01000);
+
+		addChild(defend1, 3);
+		Size m(player[0]->getCharaSpr()->getContentSize().width * 2, player[0]->getCharaSpr()->getContentSize().height);
+		auto defend1Body = PhysicsBody::createBox(player[0]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
+		defend1Body->setDynamic(false);
+		defend1Body->setPositionOffset(Vec2(100, 100));
+		defend1Body->setCategoryBitmask(0x01000);
+		defend1Body->setCollisionBitmask(0x01000);
+		defend1Body->setContactTestBitmask(0x01000);
+		defend1->setPhysicsBody(defend1Body);
+
+		defend1->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate, NULL));
 	}
 }
 
 void Games::playerdefend2(){
-	if (defend2 == NULL){
-		defend2 = Sprite::create("defend.png");
-		defend2->setScaleX(0.2);
-		defend2->setScaleY(0.05);
+	auto changestate1 = CallFunc::create([&]() {
+		defend2->removeFromParent();
+		defend2 = NULL;
+	});
+
+	if (defend2 == NULL) {
+		defend2 = Sprite::create();
+		defend2->setAnchorPoint(Vec2(0.5, 0.5));
+		defend2->setPosition(player[1]->getCharaSpr()->getPosition());
 		defend2->setTag(8);
-		if (player[1]->getIsRight()) {
-			defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x + player[1]->getCharaSpr()->getContentSize().width / 2 + defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
-		}
-		else {
-			defend2->setPosition(Vec2(player[1]->getCharaSpr()->getPosition().x - player[1]->getCharaSpr()->getContentSize().width / 2 - defend2->getContentSize().width / 2, player[1]->getCharaSpr()->getPosition().y));
-		}
-		addChild(defend2, 2);
-		defend2->setPhysicsBody(PhysicsBody::createBox(defend2->getContentSize(), PhysicsMaterial(0.0f, 0.0f, 0.0f)));
-		defend2->getPhysicsBody()->setDynamic(false);
-		defend2->getPhysicsBody()->setCategoryBitmask(0x10000);
-		defend2->getPhysicsBody()->setCollisionBitmask(0x10000);
-		defend2->getPhysicsBody()->setContactTestBitmask(0x10000);
+
+		addChild(defend2, 3);
+		Size m(player[1]->getCharaSpr()->getContentSize().width * 2, player[1]->getCharaSpr()->getContentSize().height);
+		auto defend2Body = PhysicsBody::createBox(player[1]->getCharaSpr()->getContentSize()*1.5, PhysicsMaterial(0.0f, 0.0f, 0.0f));
+		defend2Body->setDynamic(false);
+		defend2Body->setPositionOffset(Vec2(100, 100));
+		defend2Body->setCategoryBitmask(0x10000);
+		defend2Body->setCollisionBitmask(0x10000);
+		defend2Body->setContactTestBitmask(0x10000);
+		defend2->setPhysicsBody(defend2Body);
+
+		defend2->runAction(Sequence::create(Animate::create(Animation::createWithSpriteFrames(defend, 0.09f)), changestate1, NULL));
 	}
+}
+
+void Games::playermagic1(){
+	if (magic1 == NULL) {
+		magic1 = Sprite::create("image 3.png");
+		auto ballbody = PhysicsBody::createCircle(magic1->getContentSize().width / 2, PhysicsMaterial(1.0f, 0.0f, 0.0f));
+		ballbody->setContactTestBitmask(0x11111);
+		magic1->setPhysicsBody(ballbody);
+		magic1->setTag(9);
+		magic1->setPosition(player[1]->getCharaSpr()->getPositionX(), visibleSize.height - magic1->getContentSize().height);
+		addChild(magic1, 3);
+	}
+}
+
+void Games::playermagic2(){
+	if (magic2 == NULL) {
+		magic2 = Sprite::create("image 3.png");
+		auto ballbody = PhysicsBody::createCircle(magic2->getContentSize().width / 2, PhysicsMaterial(1.0f, 0.0f, 0.0f));
+		ballbody->setContactTestBitmask(0x11111);
+		magic2->setPhysicsBody(ballbody);
+		magic2->setTag(10);
+		magic2->setPosition(player[0]->getCharaSpr()->getPositionX(), visibleSize.height - magic2->getContentSize().height);
+		addChild(magic2, 3);
+	}
+
 }
 
 void Games::damage(float damage, int player)
@@ -907,12 +1035,60 @@ void Games::damage(float damage, int player)
 
 }
 
-
 void Games::win(){
 	if (hp1->getPercentage() <= 0) {
-		Director::getInstance()->replaceScene(End::createScene());
+		winFrame();
+		//Director::getInstance()->replaceScene(End::createScene());
 	}
 	else if (hp2->getPercentage() <= 0) {
-		Director::getInstance()->replaceScene(End::createScene());
+		winFrame();
+		//Director::getInstance()->replaceScene(End::createScene());
 	}
+}
+
+void Games::winFrame()
+{
+	if (winJ == true)
+	{
+		Sprite* a = Sprite::create("black7.png");
+		a->setPosition(480, 320);
+		addChild(a, 5);
+		Sprite* b = Sprite::create("guang.png");
+		b->setPosition(1440, 270);
+		addChild(b, 6);
+		CCMoveTo* bm = CCMoveTo::create(0.3f, ccp(480, 270));
+		b->runAction(bm);
+		if (hp2->getPercentage()) {
+			Sprite* c = Sprite::create("2p.png");
+			c->setPosition(-480, 270);
+			addChild(c, 7);
+			CCMoveTo* cm = CCMoveTo::create(0.3f, ccp(480, 270));
+			c->runAction(cm);
+		}
+		else {
+			Sprite* c = Sprite::create("1p.png");
+			c->setPosition(-480, 270);
+			addChild(c, 7);
+			CCMoveTo* cm = CCMoveTo::create(0.3f, ccp(480, 270));
+			c->runAction(cm);
+		}
+		winJ = false;
+
+		MenuItemImage* label0 = MenuItemImage::create("Return.png", "Return.png");
+		auto menuItem = MenuItemLabel::create(label0);
+		auto menu = Menu::create(menuItem, nullptr);
+		menuItem->setCallback([&](cocos2d::Ref *sender) {
+			auto scene = HelloWorld::createScene();
+			HelloWorld* temp = HelloWorld::create();
+			temp->isBgm = isBgm;
+			scene->addChild(temp);
+			Director::getInstance()->replaceScene(scene);
+		});
+		menu->setPosition(Vec2::ZERO);
+		menuItem->setScale(0.15);
+		menuItem->setAnchorPoint(Vec2(0, 1));
+		menuItem->setPosition(visibleSize.width / 2-90,200);
+		addChild(menu, 6);
+	}
+	
 }

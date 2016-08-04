@@ -11,6 +11,8 @@ public:
 
     virtual bool init();
 
+	virtual void onEnter();
+
 	virtual void onStart(Ref* ref);
 
 	virtual void onVS(Ref* ref);
@@ -27,6 +29,8 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);
+
+	bool isBgm;
 
 private:
 	MenuItemImage* startMenuItem;
@@ -51,6 +55,8 @@ private:
 	MenuItemImage* mode1;
 	MenuItemImage* mode2;
 	MenuItemImage* bac;
+
+	MenuItemImage* menuItem1;
 
 };
 

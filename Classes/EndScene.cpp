@@ -54,5 +54,5 @@ bool End::init()
 }
 
 void End::onStart(Ref* ref) {
-	Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, Games::createScene()));
+	//Director::getInstance()->replaceScene(CCTransitionProgressOutIn::create(1.0f, Games::createScene()));
 }
